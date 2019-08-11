@@ -24,21 +24,28 @@ namespace PicDecode
             savedData = data;
             dataOffset = 0;
 
-            UInt16 sig = GetWord();
-
-            if ((sig & 0xff) != 0x58 )      // 'X'
+            string magic = Encoding.UTF8.GetString(data, 0, 2);
+            dataOffset += 2;
+            if (magic[0] != 'X' && magic[0] != 'M') 
                 throw new Exception("Invalid PIC format!");
-
+            bool hasPalette = false;
+            if (magic[0] == 'M')
+            {
+                hasPalette = true;
+                int paletteDataLength = BitConverter.ToUInt16(data,dataOffset);
+                dataOffset += paletteDataLength + 2;
+                dataOffset += 2;
+            }
             /// Engine also support other formats, but we don't support it since all .pics are "X" format
-
-            bcdPacked = ((sig >> 8) & 1) != 0 ? true : false;
+            bcdPacked = magic == "X1";
 
             compressedSize = GetWord();
+            if (magic == "M1") compressedSize = data.Length % 65536 - 4;
             width = GetWord();
             height = GetWord();
 
-            Console.WriteLine("width: {0}, height: {1}, compressed size: 0x{2}, bcdPacked: {3}",
-                width.ToString(), height.ToString(), compressedSize.ToString("X"), bcdPacked.ToString() );
+            Console.WriteLine("width: {0}, height: {1}, compressed size: 0x{2}, bcdPacked: {3}, hasPalette: {4}",
+                width.ToString(), height.ToString(), compressedSize.ToString("X"), bcdPacked.ToString(), hasPalette.ToString());
 
             PrepareContext();
         }
@@ -74,13 +81,14 @@ namespace PicDecode
         private int savedIndex = 0;
         private byte savedByte = 0;
 
+        public bool passedFirstByte = false;
         private void PrepareContext()
         {
             RepeatCount = 0;
             RepeatByte = 0;
 
             SomeBuffer = new byte[0x10000];
-            SomeBufferOffset = 0;
+            SomeBufferOffset = -1;
 
             MagicValueWord = GetWord();
 
@@ -93,10 +101,11 @@ namespace PicDecode
             MagicValueWord &= 0xff00;
             MagicValueWord |= MagicValueByte;
 
+
             bitPointer = 8;
 
             LUT = new byte[(1 << MagicValueByte) * 3];
-
+            
             PrepareBuffer();
         }
 
@@ -126,6 +135,26 @@ namespace PicDecode
         /// Sequiental decoder
         /// </summary>
         /// <param name="amount"></param>
+        
+        public void DecodeImage(byte[,] data)
+        {
+            byte[] line;
+            for (int y = 0; y < data.GetLength(1); y++)
+            {
+                line = new byte[data.GetLength(0)];
+                try
+                {
+                    DecodeNextBytes(line);
+                }
+                catch(IndexOutOfRangeException e)
+                {
+                    Console.WriteLine("The image data is shorter than the given dimensions in the PIC file.");
+                    return;   
+                }
+                for (int x = 0; x < data.GetLength(0); x++) data[x, y] = line[x];
+            }
+            
+        }
 
         public void DecodeNextBytes(byte [] outPut, bool debug=false)
         {
@@ -140,7 +169,7 @@ namespace PicDecode
                 opcount = outPut.Length;
             }
 
-            for(int i=0; i<opcount; i++)
+            for (int i = 0; i < opcount; i++)
             {
                 byte value;
 
@@ -154,8 +183,8 @@ namespace PicDecode
                 else
                 {
                     value = NextRun();
-                    
-                    if ( value == 0x90 )
+
+                    if (value == 0x90)
                     {
                         value = NextRun();
 
@@ -178,30 +207,29 @@ namespace PicDecode
                 }
 
                 /// Output byte
-
-                if (bcdPacked)
-                {
-                    /// Unpack BCD as uint16
-
-                    byte hiPart = (byte)(value >> 4);
-                    byte lowPart = (byte)(value & 0xf);
-
-                    outPut[2*i + 1] = hiPart;
-                    outPut[2*i] = lowPart;
-
-                    if (debug)
+                    if (bcdPacked)
                     {
-                        Console.Write(lowPart.ToString("X2") + " ");
-                        Console.Write(hiPart.ToString("X2") + " ");
-                    }
-                }
-                else
-                {
-                    outPut[i] = value;
+                        /// Unpack BCD as uint16
 
-                    if (debug)
-                        Console.Write(value.ToString("X2") + " ");
-                }
+                        byte hiPart = (byte)(value >> 4);
+                        byte lowPart = (byte)(value & 0xf);
+
+                        outPut[2 * i + 1] = hiPart;
+                        outPut[2 * i] = lowPart;
+
+                        if (debug)
+                        {
+                            Console.Write(lowPart.ToString("X2") + " ");
+                            Console.Write(hiPart.ToString("X2") + " ");
+                        }
+                    }
+                    else
+                    {
+                        outPut[i] = value;
+
+                        if (debug)
+                            Console.Write(value.ToString("X2") + " ");
+                    }
             }
 
             if (debug)
