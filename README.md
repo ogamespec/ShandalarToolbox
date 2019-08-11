@@ -1,8 +1,8 @@
 # PicDecoder
 
-Microprose classic games .PIC file format decoder (particulary from Magic: The Gathering 1997).
+This fork adds the ability to export to PNG and to open PIC files with palette data.
 
-I spend several hours figuring out how this crazy decoding work :p  (PicReveresing.c)
+Original version created by https://github.com/ogamespec
 
 First, load appropriate .TR palette:
 
