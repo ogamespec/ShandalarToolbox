@@ -57,6 +57,7 @@
     <Compile Include="FormPalette.Designer.cs">
       <DependentUpon>FormPalette.cs</DependentUpon>
     </Compile>
+    <Compile Include="OpenFolderDialog.cs" />
     <Compile Include="PalDecoder.cs" />
     <Compile Include="PicDecoder.cs" />
     <Compile Include="Program.cs" />

@@ -31,6 +31,7 @@ namespace PicDecode
         private byte[] SavedImageData;
         public Bitmap[] loadedImages;
         public string loadedImageFilename, imagePath;
+        public int loadedImageIndex;
 
 
         public Form1()
@@ -155,6 +156,7 @@ namespace PicDecode
                 loadedImages = SprDecoder.GetSprites(data, palette);
                 pictureBox1.Image = loadedImages[0];
                 numericUpDown1.Value = 0;
+                loadedImageIndex = 0;
                 exportToolStripMenuItem.Enabled = true;
                 exportAllToolStripMenuItem.Enabled = true;
 
@@ -187,8 +189,8 @@ namespace PicDecode
                             break;
                         case ImageType.Spr:
                             loadedImages = SprDecoder.GetSprites(SavedImageData, palette);
-                            pictureBox1.Image = loadedImages[0];
-                            numericUpDown1.Value = 0;
+                            pictureBox1.Image = loadedImages[loadedImageIndex];
+                            numericUpDown1.Value = loadedImageIndex;
                             break;
 
 
@@ -224,13 +226,15 @@ namespace PicDecode
         }
         private void ExportAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            folderBrowserDialog1.SelectedPath = imagePath;
-            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            OpenFolderDialog openFolderDialog = new OpenFolderDialog();
+            openFolderDialog.InitialFolder = imagePath;
+            if (openFolderDialog.ShowDialog(this) == DialogResult.OK)
             {
-                if(!Directory.Exists(folderBrowserDialog1.SelectedPath + "/" + loadedImageFilename)) Directory.CreateDirectory(folderBrowserDialog1.SelectedPath + "/" + loadedImageFilename);
+                string imagesDirectory = openFolderDialog.SelectedFolder + "/" + loadedImageFilename;
+                if (!Directory.Exists(imagesDirectory)) Directory.CreateDirectory(imagesDirectory);
                 for (int i = 0; i < loadedImages.Length; i++)
                 {
-                    loadedImages[i].Save(folderBrowserDialog1.SelectedPath + "/" + loadedImageFilename + "/" + loadedImageFilename + "_" + i + ".png");
+                    loadedImages[i].Save(imagesDirectory + "/" + loadedImageFilename + "_" + i + ".png");
                 }
 
                 Console.WriteLine("Finished exporting all images.");
@@ -261,7 +265,7 @@ namespace PicDecode
             pictureBox1.Image = loadedImages[(int)numericUpDown1.Value];
         }
 
- 
+
         private void OpenFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
 

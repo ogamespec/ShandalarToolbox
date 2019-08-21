@@ -36,6 +36,7 @@
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pngToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,8 +52,6 @@
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.exportAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel1.SuspendLayout();
@@ -92,7 +91,7 @@
             this.toolStripMenuItem2,
             this.toolStripMenuItem3});
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(155, 26);
             this.loadToolStripMenuItem.Text = "Load";
             // 
             // toolStripMenuItem1
@@ -122,26 +121,34 @@
             this.pngToolStripMenuItem});
             this.exportToolStripMenuItem.Enabled = false;
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(155, 26);
             this.exportToolStripMenuItem.Text = "Export";
             // 
             // pngToolStripMenuItem
             // 
             this.pngToolStripMenuItem.Name = "pngToolStripMenuItem";
-            this.pngToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.pngToolStripMenuItem.Size = new System.Drawing.Size(121, 26);
             this.pngToolStripMenuItem.Text = "PNG";
             this.pngToolStripMenuItem.Click += new System.EventHandler(this.exportPngToolStripMenuItem_Click);
+            // 
+            // exportAllToolStripMenuItem
+            // 
+            this.exportAllToolStripMenuItem.Enabled = false;
+            this.exportAllToolStripMenuItem.Name = "exportAllToolStripMenuItem";
+            this.exportAllToolStripMenuItem.Size = new System.Drawing.Size(155, 26);
+            this.exportAllToolStripMenuItem.Text = "Export all";
+            this.exportAllToolStripMenuItem.Click += new System.EventHandler(this.ExportAllToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(221, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(152, 6);
             this.toolStripSeparator1.Click += new System.EventHandler(this.ToolStripSeparator1_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(155, 26);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -247,14 +254,6 @@
             this.panel2.Size = new System.Drawing.Size(719, 390);
             this.panel2.TabIndex = 4;
             // 
-            // exportAllToolStripMenuItem
-            // 
-            this.exportAllToolStripMenuItem.Enabled = false;
-            this.exportAllToolStripMenuItem.Name = "exportAllToolStripMenuItem";
-            this.exportAllToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
-            this.exportAllToolStripMenuItem.Text = "Export all";
-            this.exportAllToolStripMenuItem.Click += new System.EventHandler(this.ExportAllToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -306,7 +305,6 @@
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.ToolStripMenuItem exportAllToolStripMenuItem;
-        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
     }
 }
 
