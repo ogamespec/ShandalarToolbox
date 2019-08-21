@@ -1,6 +1,6 @@
 # PicDecoder
 
-This fork adds the ability to export to PNG and to open PIC files with embedded palette data.
+This fork adds the ability to export to png, to open .pic files with embedded palette data and to open .spr files.
 
 Original version created by https://github.com/ogamespec
 
