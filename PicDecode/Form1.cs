@@ -139,6 +139,7 @@ namespace PicDecode
             loadedImages = new Bitmap[] { bitmap };
             numericUpDown1.Value = 0;
             pictureBox1.Image = bitmap;
+            label2.Text = "Width: " + pictureBox1.Width + "  " + "Height: " + pictureBox1.Height;
         }
 
         private void LoadSprToolStripMenuItem_Click(object sender, EventArgs e)
@@ -159,6 +160,7 @@ namespace PicDecode
                 loadedImageIndex = 0;
                 exportToolStripMenuItem.Enabled = true;
                 exportAllToolStripMenuItem.Enabled = true;
+                label2.Text = "Width: " + pictureBox1.Width + "  " + "Height: " + pictureBox1.Height;
 
 
             }
@@ -261,7 +263,7 @@ namespace PicDecode
                 return;
             }
             if (numericUpDown1.Value >= loadedImages.Length) numericUpDown1.Value = loadedImages.Length - 1;
-            //if (numericUpDown1.Value < 0) numericUpDown1.Value = 0;
+            loadedImageIndex = (int)numericUpDown1.Value;
             pictureBox1.Image = loadedImages[(int)numericUpDown1.Value];
         }
 

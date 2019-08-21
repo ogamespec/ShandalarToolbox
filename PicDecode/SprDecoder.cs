@@ -34,10 +34,10 @@ namespace PicDecode{
                 int cutoffOffsetY = BitConverter.ToUInt16(data, offset); //how many lines after the transparent space in the image to start setting pixels as transparent
                 offset += 2;
                 Bitmap bitmap = new Bitmap(width,height);
-                bitmap.MakeTransparent();
-                Console.WriteLine("Image " + imageIndex + " information: offset: 0x" + startOffset.ToString("X") +  ", Image data size: 0x" + imageDataSize.ToString("X") +
-                    ", width: " + width + ", height: " + height + ", unknown1: 0x" +
-                    unknown1.ToString("X") + ", unknown2: 0x" + unknown2.ToString("X") + ",number of top empty lines: " + numberOfEmptyLinesAbove + ", cutoff y offset: " + cutoffOffsetY) ;
+                //Console.WriteLine("Image " + imageIndex + " information: offset: 0x" + startOffset.ToString("X") +  ", Image data size: 0x" + imageDataSize.ToString("X") +
+                //   ", width: " + width + ", height: " + height + ", unknown1: 0x" +
+                //    unknown1.ToString("X") + ", unknown2: 0x" + unknown2.ToString("X") + ",number of top empty lines: " + numberOfEmptyLinesAbove + ", cutoff y offset: " + cutoffOffsetY) ;
+
                 bool lineHasTransparentPixels; //set to true when the line has intentionally transparent pixels
                 int numberOfPixelsInData = 0;
                 for (int y = 0; y < height; y++)
@@ -84,7 +84,7 @@ namespace PicDecode{
                     }
                     for (int x = 0; x < width; x++)
                     {
-                        if (data[offset] == 0xFF && !lineHasTransparentPixels) offset++;
+                        while(data[offset] == 0xFF && !lineHasTransparentPixels) offset++;
                         
                         if (x < transparentPixelsAmount || x >= numberOfPixelsInData + transparentPixelsAmount)
                         {
