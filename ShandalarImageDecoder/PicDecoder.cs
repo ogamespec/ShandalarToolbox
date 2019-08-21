@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PicDecode
+namespace ShandalarImageDecoder
 {
     class PicDecoder
     {

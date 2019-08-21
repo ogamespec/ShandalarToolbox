@@ -1,4 +1,4 @@
-﻿namespace PicDecode
+﻿namespace ShandalarImageDecoder
 {
     partial class FormPalette
     {

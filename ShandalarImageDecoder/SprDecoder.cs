@@ -9,7 +9,7 @@ using System.Drawing;
 
 
 
-namespace PicDecode{
+namespace ShandalarImageDecoder {
     public class SprDecoder{
         
         public static Bitmap[] GetSprites (byte[] data, Color[] palette){
