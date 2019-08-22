@@ -148,7 +148,7 @@ namespace ShandalarImageDecoder
                 }
                 catch(IndexOutOfRangeException e)
                 {
-                    Console.WriteLine("The image data is shorter than the given dimensions in the PIC file.");
+                    if(e != null) Console.WriteLine("The image data is shorter than the given dimensions in the PIC file.");
                     return;   
                 }
                 for (int x = 0; x < data.GetLength(0); x++) data[x, y] = line[x];
