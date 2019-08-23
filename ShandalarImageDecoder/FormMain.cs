@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 
 namespace ShandalarImageDecoder
 {
+ 
     public partial class FormMain : Form
     {
         [DllImport("kernel32")]
@@ -92,6 +93,8 @@ namespace ShandalarImageDecoder
                 Text = windowTitle + " - " + Path.GetFileName(openFileDialog1.FileName);
                 Console.WriteLine("Loaded file path: " + openFileDialog1.FileName);
                 ShowPic(SavedImageData);
+                assetsListBox.Items.Clear();
+                assetsListBox.Items.Add(loadedImageFilename);
                 exportToolStripMenuItem.Enabled = true;
                 exportAllToolStripMenuItem.Enabled = true;
             }
@@ -142,9 +145,8 @@ namespace ShandalarImageDecoder
                 }
             }
             loadedImages = new Bitmap[] { bitmap };
-            numericUpDown1.Value = 0;
             ShowImage(bitmap);
-            label2.Text = "Width: " + bitmap.Width + "  " + "Height: " + bitmap.Height;
+
         }
 
         private void LoadSprToolStripMenuItem_Click(object sender, EventArgs e)
@@ -161,11 +163,15 @@ namespace ShandalarImageDecoder
                 Console.WriteLine("Loaded file path: " + openFileDialog3.FileName);
                 loadedImages = SprDecoder.GetSprites(data, palette);
                 ShowImage(loadedImages[0]);
-                numericUpDown1.Value = 0;
                 loadedImageIndex = 0;
+                assetsListBox.Items.Clear();
+                for (int i = 0; i < loadedImages.Length; i++)
+                {
+                    assetsListBox.Items.Add(loadedImageFilename + i);
+                }
                 exportToolStripMenuItem.Enabled = true;
                 exportAllToolStripMenuItem.Enabled = true;
-                label2.Text = "Width: " + loadedImages[0].Width + "  " + "Height: " + loadedImages[0].Height;
+                
 
 
             }
@@ -174,6 +180,7 @@ namespace ShandalarImageDecoder
         public void ShowImage(Bitmap imageTexture)
         {
             imagePanel.BackgroundImage = imageTexture;
+            label2.Text = "Width: " + imageTexture.Width + "  " + "Height: " + imageTexture.Height;
             if (imageTexture.Width > imagePanel.Width || imageTexture.Height > imagePanel.Height)
                 imagePanel.BackgroundImageLayout = ImageLayout.Zoom;
             else
@@ -205,7 +212,6 @@ namespace ShandalarImageDecoder
                         case ImageType.Spr:
                             loadedImages = SprDecoder.GetSprites(SavedImageData, palette);
                             ShowImage(loadedImages[loadedImageIndex]);
-                            numericUpDown1.Value = loadedImageIndex;
                             break;
 
 
@@ -235,7 +241,7 @@ namespace ShandalarImageDecoder
             saveFileDialog1.InitialDirectory = imagePath;
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                imagePanel.BackgroundImage.Save(saveFileDialog1.FileName);
+                 loadedImages[0].Save(saveFileDialog1.FileName);
 
             }
         }
@@ -268,16 +274,13 @@ namespace ShandalarImageDecoder
         }
 
 
-        private void NumericUpDown1_ValueChanged(object sender, EventArgs e)
+
+
+        private void AssetsListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (loadedImages == null)
-            {
-                numericUpDown1.Value = 0;
-                return;
-            }
-            if (numericUpDown1.Value >= loadedImages.Length) numericUpDown1.Value = loadedImages.Length - 1;
-            loadedImageIndex = (int)numericUpDown1.Value;
-            ShowImage(loadedImages[(int)numericUpDown1.Value]);
+            loadedImageIndex = assetsListBox.SelectedIndex;
+            ShowImage(loadedImages[assetsListBox.SelectedIndex]);
+
         }
 
         private void OpenFileDialog1_FileOk(object sender, CancelEventArgs e)
