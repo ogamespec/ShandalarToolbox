@@ -24,13 +24,7 @@ namespace ShandalarImageToolbox
         private List<Color[]> palettes = new List<Color[]>();
  
 
-        public enum ImageType
-        {
-            Pic,
-            Spr,
-            Cat
-        }
-        public ImageType loadedImageType;
+       
         public List<ShandalarAsset> loadedImages = new List<ShandalarAsset>();
         public int loadedImageIndex;
         public string windowTitle;
@@ -106,28 +100,28 @@ namespace ShandalarImageToolbox
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.DefaultExt = "pic";
             openFileDialog.Filter = "PIC Files|*.pic|All Files|*.*";
+            openFileDialog.Multiselect = true;
             if ( openFileDialog.ShowDialog() == DialogResult.OK)
             {
-
-                
-                byte[] fileData = File.ReadAllBytes(openFileDialog.FileName);
-                string fileText = File.ReadAllText(openFileDialog.FileName);
-                hexEditor1.LoadData(fileData);
-                textBox1.Text = fileText;
-                previewModeComboBox.SelectedIndex = 0;
-                string loadedImageFilename = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
-                loadedImageType = ImageType.Pic;
-                Text = windowTitle + " - " + Path.GetFileName(openFileDialog.FileName);
-                Console.WriteLine("Loaded file path: " + openFileDialog.FileName);
-                ShowPic(fileData, loadedImageFilename);
                 assetsListBox.Items.Clear();
-                assetsListBox.Items.Add(loadedImageFilename);
+                loadedImages.Clear();
+                foreach (string fileName in openFileDialog.FileNames)
+                {
+                    byte[] fileData = File.ReadAllBytes(fileName);
+                    previewModeComboBox.SelectedIndex = 0;
+                    string loadedImageFilename = Path.GetFileNameWithoutExtension(fileName);
+                    Text = windowTitle + " - " + Path.GetFileName(fileName);
+                    Console.WriteLine("Loaded file path: " + fileName);
+                    loadedImages.Add(GetPic(fileData, loadedImageFilename));
+
+                    assetsListBox.Items.Add(loadedImageFilename);
+                }
                 exportToolStripMenuItem.Enabled = true;
                 exportAllToolStripMenuItem.Enabled = true;
             }
         }
 
-        private void ShowPic ( byte [] data, string name)
+        public ShandalarAsset GetPic ( byte [] data, string name)
         {
             Color[] originalPalette = palettes[selectedPaletteIndex];
             int dataOffset = 0;
@@ -174,11 +168,11 @@ namespace ShandalarImageToolbox
                 }
             }
             palettes[selectedPaletteIndex] = originalPalette;
-            ShandalarAsset asset = new ShandalarAsset(name, data);
+            ShandalarAsset asset = new ShandalarAsset(name, data, ImageType.Pic);
             asset.image = bitmap;
+            asset.imageType = ImageType.Pic;
             ClearImagePanel();
-            loadedImages = new List<ShandalarAsset>();
-            loadedImages.Add(asset);
+            return asset;
 
         }
 
@@ -191,24 +185,20 @@ namespace ShandalarImageToolbox
             {
                 exportToolStripMenuItem.Enabled = true;
                 byte[] data = File.ReadAllBytes(openFileDialog.FileName);
-                string fileText = File.ReadAllText(openFileDialog.FileName);
-                hexEditor1.LoadData(data);
-                textBox1.Text = fileText;
                 previewModeComboBox.SelectedIndex = 0;
                 Text = windowTitle + " - " + Path.GetFileName(openFileDialog.FileName);
-                loadedImageType = ImageType.Spr;
                 string loadedImageFilename = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
                 Console.WriteLine("Loaded file path: " + openFileDialog.FileName);
                 List<Bitmap> sprites = SprDecoder.GetSprites(data, palettes[selectedPaletteIndex]).ToList();
                 ClearImagePanel();
+                assetsListBox.Items.Clear();
                 loadedImages.Clear();
                 for(int i = 0; i < sprites.Count; i++)
                 {
-                    ShandalarAsset asset = new ShandalarAsset(loadedImageFilename, data);
+                    ShandalarAsset asset = new ShandalarAsset(loadedImageFilename, data,ImageType.Spr);
                     asset.image = sprites[i];
                     loadedImages.Add(asset);
                 }
-                assetsListBox.Items.Clear();
                 for (int i = 0; i < loadedImages.Count; i++)
                 {
                     assetsListBox.Items.Add(loadedImageFilename + "_" +i);
@@ -294,13 +284,28 @@ namespace ShandalarImageToolbox
             openFolderDialog.InitialFolder = Path.GetDirectoryName(loadedImages[loadedImageIndex].filename);
             if (openFolderDialog.ShowDialog(this) == DialogResult.OK)
             {
-               
+                string imagesDirectory;
+
                 for (int i = 0; i < loadedImages.Count; i++)
                 {
-                    string imagesDirectory = openFolderDialog.SelectedFolder + "/extractedImages/" + loadedImages[i].filename;
-                    if (!Directory.Exists(imagesDirectory)) Directory.CreateDirectory(imagesDirectory);
-                    loadedImages[i].image.Save(imagesDirectory + "/" + loadedImages[i].filename + "_" + i + ".png");
+
+                    switch (loadedImages[i].imageType) {
+                        case ImageType.Pic:
+                        imagesDirectory = openFolderDialog.SelectedFolder + "/extractedImages/";
+                            if (!Directory.Exists(imagesDirectory)) Directory.CreateDirectory(imagesDirectory);
+                            loadedImages[i].image.Save(imagesDirectory + loadedImages[i].filename + ".png");
+                        break;
+                        case ImageType.Spr:
+                        imagesDirectory = openFolderDialog.SelectedFolder + "/extractedImages/" + loadedImages[i].filename;
+                        if (!Directory.Exists(imagesDirectory)) Directory.CreateDirectory(imagesDirectory);
+                        loadedImages[i].image.Save(imagesDirectory + "/" + loadedImages[i].filename + "_" + i + ".png");
+                        break;
+                            
+                    }
+                
+                    
                 }
+                
 
                 Console.WriteLine("Finished exporting all images.");
             }
@@ -323,7 +328,10 @@ namespace ShandalarImageToolbox
         private void AssetsListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             loadedImageIndex = assetsListBox.SelectedIndex;
-            if(loadedImageIndex != -1 && loadedImages.Count > 0 && loadedImages[assetsListBox.SelectedIndex].image != null) ShowImage(loadedImages[assetsListBox.SelectedIndex].image);
+            if(loadedImageIndex != -1 && loadedImages[assetsListBox.SelectedIndex].image != null) ShowImage(loadedImages[assetsListBox.SelectedIndex].image);
+            string fileText =  Convert.ToString(loadedImages[assetsListBox.SelectedIndex].data);
+            hexEditor1.LoadData(loadedImages[assetsListBox.SelectedIndex].data);
+            textBox1.Text = fileText;
 
         }
 
@@ -342,9 +350,11 @@ namespace ShandalarImageToolbox
                 Cat cat = new Cat(openFileDialog.FileName);
                 assetsListBox.Items.Clear();
                 loadedImages.Clear();
-                foreach(var file in cat.files)
+                for(int i = 0; i < cat.files.Count; i++)
                 {
-                    assetsListBox.Items.Add(file);
+                    string name = Path.GetFileNameWithoutExtension(openFileDialog.FileName) + "_" + i;
+                    assetsListBox.Items.Add(name);
+                    loadedImages.Add(new ShandalarAsset(name,cat.files[i].data,ImageType.Cat));
                 }
             }
         }
@@ -381,25 +391,25 @@ namespace ShandalarImageToolbox
             selectedPaletteIndex = paletteComboBox.SelectedIndex;
             if (loadedImages.Count > 0 && loadedImages[loadedImageIndex].data != null)
             {
-                switch (loadedImageType)
+                foreach (ShandalarAsset asset in loadedImages)
                 {
-                    case ImageType.Pic:
-                        ShowPic(loadedImages[loadedImageIndex].data, loadedImages[loadedImageIndex].filename);
-                        ShowImage(loadedImages[loadedImageIndex].image);
-                        break;
-                    case ImageType.Spr:
-                        List<Bitmap> sprites = SprDecoder.GetSprites(loadedImages[loadedImageIndex].data, palettes[selectedPaletteIndex]);
-                        for (int i = 0; i < sprites.Count; i++)
-                        {
-                            ShandalarAsset asset = new ShandalarAsset(loadedImages[loadedImageIndex].filename, loadedImages[loadedImageIndex].data);
-                            asset.image = sprites[i];
-                            loadedImages[i] = asset;
-                        }
-                        ShowImage(loadedImages[loadedImageIndex].image);
-                        break;
+                    switch (asset.imageType)
+                    {
+                        case ImageType.Pic:
+                             asset.image = GetPic(asset.data, asset.filename).image;
+
+                            break;
+                        case ImageType.Spr:
+                            List<Bitmap> sprites = SprDecoder.GetSprites(loadedImages[loadedImageIndex].data, palettes[selectedPaletteIndex]);
+                                asset.image = sprites[asset.childIndex];
+                            
+                            break;
 
 
+                    }
                 }
+
+                ShowImage(loadedImages[loadedImageIndex].image);
 
             }
         }
