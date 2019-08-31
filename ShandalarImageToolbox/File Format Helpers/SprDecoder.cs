@@ -9,10 +9,10 @@ using System.Drawing;
 
 
 
-namespace ShandalarImageDecoder {
+namespace ShandalarImageToolbox {
     public class SprDecoder{
         
-        public static Bitmap[] GetSprites (byte[] data, Color[] palette){
+        public static List<Bitmap> GetSprites (byte[] data, Color[] palette){
             List<Bitmap> bitmaps = new List<Bitmap>();
             int offset = 0;
             int imageIndex = 0;
@@ -34,9 +34,8 @@ namespace ShandalarImageDecoder {
                 int cutoffOffsetY = BitConverter.ToUInt16(data, offset); //how many lines after the transparent space in the image to start setting pixels as transparent
                 offset += 2;
                 Bitmap bitmap = new Bitmap(width,height);
-                //Console.WriteLine("Image " + imageIndex + " information: offset: 0x" + startOffset.ToString("X") +  ", Image data size: 0x" + imageDataSize.ToString("X") +
-                //   ", width: " + width + ", height: " + height + ", unknown1: 0x" +
-                //    unknown1.ToString("X") + ", unknown2: 0x" + unknown2.ToString("X") + ",number of top empty lines: " + numberOfEmptyLinesAbove + ", cutoff y offset: " + cutoffOffsetY) ;
+             //   Console.WriteLine("Image " + imageIndex + " information: offset: 0x" + startOffset.ToString("X") +  ", Image data size: 0x" + imageDataSize.ToString("X") + ", width: " + width + ", height: " + height + ", unknown1: 0x" +
+              //  unknown1.ToString("X") + ", unknown2: 0x" + unknown2.ToString("X") + ",number of top empty lines: " + numberOfEmptyLinesAbove + ", cutoff y offset: " + cutoffOffsetY) ;
 
                 bool lineHasTransparentPixels; //set to true when the line has intentionally transparent pixels
                 int numberOfPixelsInData = 0;
@@ -52,7 +51,7 @@ namespace ShandalarImageDecoder {
                         continue;
                         
                     }
-                    //Console.WriteLine("Current offset: 0x" + offset.ToString("X") + ", y: " + y);
+                   // Console.WriteLine("Current offset: 0x" + offset.ToString("X") + ", y: " + y);
                     while (data[offset] == 0xFF) offset++;
                     if (offset >= startOffset + (int)imageDataSize)
                     {
@@ -84,8 +83,9 @@ namespace ShandalarImageDecoder {
                     }
                     for (int x = 0; x < width; x++)
                     {
-                        while(data[offset] == 0xFF && !lineHasTransparentPixels) offset++;
-                        
+                        //while(data[offset] == 0xFF && transparentPixelsAmount > 2) offset++;
+
+
                         if (x < transparentPixelsAmount || x >= numberOfPixelsInData + transparentPixelsAmount)
                         {
                            bitmap.SetPixel(x, y, Color.Transparent);
@@ -111,7 +111,7 @@ namespace ShandalarImageDecoder {
                 bitmaps.Add(bitmap);
                 imageIndex++;
             }
-            return bitmaps.ToArray();
+            return bitmaps;
 
         }
     }

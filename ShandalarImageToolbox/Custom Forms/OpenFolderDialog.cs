@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace ShandalarImageDecoder
+namespace ShandalarImageToolbox
 {
     internal class OpenFolderDialog
     {

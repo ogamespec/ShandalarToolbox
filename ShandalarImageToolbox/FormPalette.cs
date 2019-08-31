@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ShandalarImageDecoder
+namespace ShandalarImageToolbox
 {
     public partial class FormPalette : Form
     {

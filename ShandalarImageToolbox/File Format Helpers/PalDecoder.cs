@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Text.RegularExpressions;
 
-namespace ShandalarImageDecoder
+namespace ShandalarImageToolbox
 {
     class PalDecoder
     {
@@ -19,7 +19,7 @@ namespace ShandalarImageDecoder
         {
             for(int i=0; i<256; i++)
             {
-                Palette[i] = Color.Black;
+                Palette[i] = Color.Transparent;
             }
         }
 
@@ -82,7 +82,6 @@ namespace ShandalarImageDecoder
                     rValue = Convert.ToByte(rStr);
                     gValue = Convert.ToByte(gStr);
                     bValue = Convert.ToByte(bStr);
-
                     Palette[index] = Color.FromArgb(rValue, gValue, bValue);
                 }
                 else
@@ -91,6 +90,10 @@ namespace ShandalarImageDecoder
                 }
             }
 
+            for (int i = 0; i < 256; i++)
+            {
+                if (Palette[i] == Color.Transparent) Palette[i] = Color.FromArgb(i, i, i);
+            }
         }
 
 

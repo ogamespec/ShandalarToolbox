@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{5ADEBD2B-0391-44AB-9484-63A427C957D6}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>ShandalarImageDecoder</RootNamespace>
-    <AssemblyName>ShandalarImageDecoder</AssemblyName>
+    <RootNamespace>ShandalarImageToolbox</RootNamespace>
+    <AssemblyName>ShandalarImageToolbox</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -53,8 +53,13 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Be.Windows.Forms.HexBox, Version=1.6.0.16335, Culture=neutral, PublicKeyToken=e0e5adf0ebc99863, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\Be.Windows.Forms.HexBox.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,7 +71,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Custom Forms\HexEditor\HexEditorNew.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Custom Forms\HexEditor\HexEditorNew.designer.cs">
+      <DependentUpon>HexEditorNew.cs</DependentUpon>
+    </Compile>
+    <Compile Include="File Format Helpers\CatFile.cs" />
+    <Compile Include="File Format Helpers\CATImageDecoder.cs" />
+    <Compile Include="ImageAsset.cs" />
+    <Compile Include="ShandalarAsset.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -79,12 +93,15 @@
     <Compile Include="FormPalette.Designer.cs">
       <DependentUpon>FormPalette.cs</DependentUpon>
     </Compile>
-    <Compile Include="OpenFolderDialog.cs" />
-    <Compile Include="PalDecoder.cs" />
-    <Compile Include="PicDecoder.cs" />
+    <Compile Include="Custom Forms\OpenFolderDialog.cs" />
+    <Compile Include="File Format Helpers\PalDecoder.cs" />
+    <Compile Include="File Format Helpers\PicDecoder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SprDecoder.cs" />
+    <Compile Include="File Format Helpers\SprDecoder.cs" />
+    <EmbeddedResource Include="Custom Forms\HexEditor\HexEditorNew.resx">
+      <DependentUpon>HexEditorNew.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
