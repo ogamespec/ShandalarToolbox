@@ -11,6 +11,8 @@ using System.Text.RegularExpressions;
 
 namespace ShandalarImageToolbox
 {
+
+ 
     class PalDecoder
     {
         public Color[] Palette = new Color[256];
@@ -90,10 +92,8 @@ namespace ShandalarImageToolbox
                 }
             }
 
-            for (int i = 0; i < 256; i++)
-            {
-                if (Palette[i] == Color.Transparent) Palette[i] = Color.FromArgb(i, i, i);
-            }
+
+
         }
 
 

@@ -109,12 +109,10 @@ namespace ShandalarImageToolbox
                 {
                     byte[] fileData = File.ReadAllBytes(fileName);
                     previewModeComboBox.SelectedIndex = 0;
-                    string loadedImageFilename = Path.GetFileNameWithoutExtension(fileName);
                     Text = windowTitle + " - " + Path.GetFileName(fileName);
                     Console.WriteLine("Loaded file path: " + fileName);
-                    loadedImages.Add(GetPic(fileData, loadedImageFilename));
-
-                    assetsListBox.Items.Add(loadedImageFilename);
+                    loadedImages.Add(GetPic(fileData, fileName));
+                    assetsListBox.Items.Add(Path.GetFileNameWithoutExtension(fileName));
                 }
                 exportToolStripMenuItem.Enabled = true;
                 exportAllToolStripMenuItem.Enabled = true;
@@ -163,7 +161,13 @@ namespace ShandalarImageToolbox
                 for (int x = 0; x < decoder.width; x++)
                 {
                     byte value = imageData[x,y];
-                    bitmap.SetPixel(x, y, palettes[selectedPaletteIndex][value]);
+                    Color color = palettes[selectedPaletteIndex][value];
+                    if (color == Color.Transparent)
+                    {
+                        if (name.Contains("Cardart")) color = Color.Black; //The pic files in the Cardart folder have a strange palette difference
+                        else color = Color.FromArgb(value, value, value);
+                    }
+                    bitmap.SetPixel(x, y, color);
 
                 }
             }

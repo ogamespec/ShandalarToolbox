@@ -97,7 +97,9 @@ namespace ShandalarImageToolbox {
                         }
                         else
                         {
-                            bitmap.SetPixel(x, y, palette[data[offset]]);
+                            Color color = palette[data[offset]];
+                            if(color == Color.Transparent) color = Color.FromArgb(data[offset], data[offset], data[offset]);
+                            bitmap.SetPixel(x, y,color);
 
                             offset++;
                         }
