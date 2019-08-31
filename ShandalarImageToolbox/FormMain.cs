@@ -274,7 +274,7 @@ namespace ShandalarImageToolbox
 
         private void exportPngToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            saveFileDialog1.FileName = Path.GetFileName(loadedImages[loadedImageIndex].filename);
+            saveFileDialog1.FileName = Path.GetFileNameWithoutExtension(loadedImages[loadedImageIndex].filename);
             saveFileDialog1.InitialDirectory = Path.GetDirectoryName(loadedImages[loadedImageIndex].filename);
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
