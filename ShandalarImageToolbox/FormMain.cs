@@ -172,7 +172,7 @@ namespace ShandalarImageToolbox
                 }
             }
             palettes[selectedPaletteIndex] = originalPalette;
-            ShandalarAsset asset = new ShandalarAsset(name, data, ImageType.Pic);
+            ShandalarAsset asset = new ShandalarAsset(Path.GetFileNameWithoutExtension(name), data, ImageType.Pic);
             asset.image = bitmap;
             asset.imageType = ImageType.Pic;
             ClearImagePanel();
@@ -201,6 +201,7 @@ namespace ShandalarImageToolbox
                 {
                     ShandalarAsset asset = new ShandalarAsset(loadedImageFilename, data,ImageType.Spr);
                     asset.image = sprites[i];
+                    asset.childIndex = i;
                     loadedImages.Add(asset);
                 }
                 for (int i = 0; i < loadedImages.Count; i++)
