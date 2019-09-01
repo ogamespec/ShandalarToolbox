@@ -144,7 +144,7 @@ namespace ShandalarImageToolbox
                     Color color = palettes[selectedPaletteIndex][value];
                     if (color == Color.Transparent)
                     {
-                        if (name.Contains("Cardb")) color = Color.Black; //The Card background pic files have a strange palette difference
+                        if (name.Contains("Cardart")) color = Color.Black; //The Cardart pic files have a strange palette difference
                         else color = Color.FromArgb(value, value, value);
                     }
                     bitmap.SetPixel(x, y, color);
