@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using System.Text.RegularExpressions;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -122,32 +122,12 @@ namespace ShandalarImageToolbox
         public ShandalarAsset GetPic ( byte [] data, string name)
         {
             Color[] originalPalette = palettes[selectedPaletteIndex];
-            int dataOffset = 0;
 
-            string magic = Encoding.UTF8.GetString(data, 0, 2);
-            dataOffset += 2;
-            if (magic[0] == 'M')
-            {
-                bool is3fRange = magic == "M0";
-                dataOffset += 2; //skip the palette data length value
-                byte startIndex = data[dataOffset++];
-                byte endIndex = data[dataOffset++];
-
-                Color[] picFilePalette = new Color[256];
-                for(int i = 0; i < endIndex - startIndex + 1; i++)
-                {
-                    int factor = is3fRange ? 4 : 1;
-                    int r = factor * data[dataOffset++];
-                    int g = factor * data[dataOffset++];
-                    int b = factor * data[dataOffset++];
-
-                    picFilePalette[i] = Color.FromArgb(r,g,b);
-                }
-
-                palettes[selectedPaletteIndex] = picFilePalette;
-            }
+            
 
             PicDecoder decoder = new PicDecoder(data);
+
+           if(decoder.hasPalette) palettes[selectedPaletteIndex] = decoder.embeddedPalette;
 
             /// Output image as picture box
 
@@ -164,7 +144,7 @@ namespace ShandalarImageToolbox
                     Color color = palettes[selectedPaletteIndex][value];
                     if (color == Color.Transparent)
                     {
-                        if (name.Contains("Cardart")) color = Color.Black; //The pic files in the Cardart folder have a strange palette difference
+                        if (name.Contains("Cardb")) color = Color.Black; //The Card background pic files have a strange palette difference
                         else color = Color.FromArgb(value, value, value);
                     }
                     bitmap.SetPixel(x, y, color);
@@ -199,9 +179,10 @@ namespace ShandalarImageToolbox
                 loadedImages.Clear();
                 for(int i = 0; i < sprites.Count; i++)
                 {
-                    ShandalarAsset asset = new ShandalarAsset(loadedImageFilename, data,ImageType.Spr);
+                    ShandalarAsset asset = new ShandalarAsset(loadedImageFilename + "_" + i, data,ImageType.Spr);
                     asset.image = sprites[i];
                     asset.childIndex = i;
+                    asset.parentName = loadedImageFilename;
                     loadedImages.Add(asset);
                 }
                 for (int i = 0; i < loadedImages.Count; i++)
@@ -215,6 +196,29 @@ namespace ShandalarImageToolbox
 
             }
 
+        }
+        private void LoadCATFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.DefaultExt = "cat";
+            openFileDialog.Filter = "Cat Files|*.cat|All Files|*.*";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                Cat cat = new Cat(openFileDialog.FileName);
+                assetsListBox.Items.Clear();
+                loadedImages.Clear();
+                for (int i = 0; i < cat.files.Count; i++)
+                {
+                    string name = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
+                    assetsListBox.Items.Add(cat.files[i].name);
+                    ShandalarAsset asset = new ShandalarAsset(cat.files[i].name, cat.files[i].data, ImageType.Cat);
+                    asset.childIndex = i;
+                    asset.parentName = name;
+                    loadedImages.Add(asset);
+                }
+            }
+            exportToolStripMenuItem.Enabled = true;
+            exportAllToolStripMenuItem.Enabled = true;
         }
         public void ShowImage(Bitmap imageTexture)
         {
@@ -301,14 +305,19 @@ namespace ShandalarImageToolbox
                             loadedImages[i].image.Save(imagesDirectory + loadedImages[i].filename + ".png");
                         break;
                         case ImageType.Spr:
-                        imagesDirectory = openFolderDialog.SelectedFolder + "/extractedImages/" + loadedImages[i].filename;
+                        imagesDirectory = openFolderDialog.SelectedFolder + "/extractedImages/" + loadedImages[i].parentName;
                         if (!Directory.Exists(imagesDirectory)) Directory.CreateDirectory(imagesDirectory);
-                        loadedImages[i].image.Save(imagesDirectory + "/" + loadedImages[i].filename + "_" + i + ".png");
+                        loadedImages[i].image.Save(imagesDirectory + "/" + loadedImages[i].filename + ".png");
                         break;
-                            
+                        case ImageType.Cat:
+                            imagesDirectory = openFolderDialog.SelectedFolder + "/extractedImages/" + loadedImages[i].parentName;
+                            if (!Directory.Exists(imagesDirectory)) Directory.CreateDirectory(imagesDirectory);
+                            File.WriteAllBytes(imagesDirectory + "/" + loadedImages[i].filename + ".wvl",loadedImages[i].data);
+
+                            break;
                     }
-                
-                    
+
+
                 }
                 
 
@@ -334,8 +343,10 @@ namespace ShandalarImageToolbox
         {
             loadedImageIndex = assetsListBox.SelectedIndex;
             if(loadedImageIndex != -1 && loadedImages[assetsListBox.SelectedIndex].image != null) ShowImage(loadedImages[assetsListBox.SelectedIndex].image);
-            string fileText =  Convert.ToString(loadedImages[assetsListBox.SelectedIndex].data);
+            string fileText = Encoding.UTF8.GetString(loadedImages[assetsListBox.SelectedIndex].data);
+            string tempText = Regex.Replace(fileText, @"\p{C}+", string.Empty);
             hexEditor1.LoadData(loadedImages[assetsListBox.SelectedIndex].data);
+            if(tempText != fileText)
             textBox1.Text = fileText;
 
         }
@@ -345,24 +356,7 @@ namespace ShandalarImageToolbox
 
         }
 
-        private void LoadCATFileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.DefaultExt = "cat";
-            openFileDialog.Filter = "Cat Files|*.cat|All Files|*.*";
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                Cat cat = new Cat(openFileDialog.FileName);
-                assetsListBox.Items.Clear();
-                loadedImages.Clear();
-                for(int i = 0; i < cat.files.Count; i++)
-                {
-                    string name = Path.GetFileNameWithoutExtension(openFileDialog.FileName) + "_" + i;
-                    assetsListBox.Items.Add(name);
-                    loadedImages.Add(new ShandalarAsset(name,cat.files[i].data,ImageType.Cat));
-                }
-            }
-        }
+       
 
 
 
@@ -375,7 +369,6 @@ namespace ShandalarImageToolbox
         {
             imagePanel.Visible = false;
             hexEditor1.Visible = false;
-            textBox1.Visible = false;
             switch (previewModeComboBox.SelectedIndex)
             {
                 case 0:
@@ -383,9 +376,6 @@ namespace ShandalarImageToolbox
                     break;
                 case 1:
                     hexEditor1.Visible = true;
-                    break;
-                case 2:
-                    textBox1.Visible = true;
                     break;
             }
         }
@@ -401,14 +391,12 @@ namespace ShandalarImageToolbox
                     switch (asset.imageType)
                     {
                         case ImageType.Pic:
-                             asset.image = GetPic(asset.data, asset.filename).image;
-
-                            break;
+                        asset.image = GetPic(asset.data, asset.filename).image;
+                        break;
                         case ImageType.Spr:
-                            List<Bitmap> sprites = SprDecoder.GetSprites(loadedImages[loadedImageIndex].data, palettes[selectedPaletteIndex]);
-                                asset.image = sprites[asset.childIndex];
-                            
-                            break;
+                        List<Bitmap> sprites = SprDecoder.GetSprites(loadedImages[loadedImageIndex].data, palettes[selectedPaletteIndex]);
+                        asset.image = sprites[asset.childIndex];
+                        break;
 
 
                     }

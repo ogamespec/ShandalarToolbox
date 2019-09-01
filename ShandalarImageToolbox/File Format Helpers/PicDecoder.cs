@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace ShandalarImageToolbox
 {
-    class PicDecoder
+   public class PicDecoder
     {
         public int width;
         public int height;
@@ -19,6 +20,8 @@ namespace ShandalarImageToolbox
         private byte[] savedData;
         private int dataOffset = 0;
 
+        public Color[] embeddedPalette = new Color[256];
+        public bool hasPalette = false;
         public PicDecoder(byte [] data)
         {
             savedData = data;
@@ -28,12 +31,23 @@ namespace ShandalarImageToolbox
             dataOffset += 2;
             if (magic[0] != 'X' && magic[0] != 'M') 
                 throw new Exception("Invalid PIC format!");
-            bool hasPalette = false;
             if (magic[0] == 'M')
             {
                 hasPalette = true;
+                bool is3fRange = magic == "M0";
                 int paletteDataLength = BitConverter.ToUInt16(data,dataOffset);
-                dataOffset += paletteDataLength + 2;
+                dataOffset += 2;
+                byte startIndex = data[dataOffset++];
+                byte endIndex = data[dataOffset++];
+                for (int i = 0; i < endIndex - startIndex + 1; i++)
+                {
+                    int factor = is3fRange ? 4 : 1;
+                    int r = factor * data[dataOffset++];
+                    int g = factor * data[dataOffset++];
+                    int b = factor * data[dataOffset++];
+
+                    embeddedPalette[i] = Color.FromArgb(r, g, b);
+                }
                 dataOffset += 2;
             }
             /// Engine also support other formats, but we don't support it since all .pics are "X" format

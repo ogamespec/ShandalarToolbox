@@ -276,7 +276,7 @@
             this.topPreviewUiPanel.Location = new System.Drawing.Point(0, 0);
             this.topPreviewUiPanel.Margin = new System.Windows.Forms.Padding(0);
             this.topPreviewUiPanel.Name = "topPreviewUiPanel";
-            this.topPreviewUiPanel.Size = new System.Drawing.Size(894, 29);
+            this.topPreviewUiPanel.Size = new System.Drawing.Size(896, 29);
             this.topPreviewUiPanel.TabIndex = 3;
             // 
             // paletteComboBox
@@ -304,8 +304,7 @@
             this.previewModeComboBox.FormattingEnabled = true;
             this.previewModeComboBox.Items.AddRange(new object[] {
             "Preview",
-            "View as hex",
-            "View as text"});
+            "View as hex"});
             this.previewModeComboBox.Location = new System.Drawing.Point(2, 2);
             this.previewModeComboBox.Margin = new System.Windows.Forms.Padding(2);
             this.previewModeComboBox.MaxDropDownItems = 3;
@@ -325,7 +324,7 @@
             this.previewPanel.Location = new System.Drawing.Point(0, 32);
             this.previewPanel.Margin = new System.Windows.Forms.Padding(2);
             this.previewPanel.Name = "previewPanel";
-            this.previewPanel.Size = new System.Drawing.Size(896, 577);
+            this.previewPanel.Size = new System.Drawing.Size(898, 577);
             this.previewPanel.TabIndex = 5;
             // 
             // imagePanel
@@ -338,7 +337,7 @@
             this.imagePanel.Location = new System.Drawing.Point(0, 0);
             this.imagePanel.Margin = new System.Windows.Forms.Padding(0);
             this.imagePanel.Name = "imagePanel";
-            this.imagePanel.Size = new System.Drawing.Size(896, 577);
+            this.imagePanel.Size = new System.Drawing.Size(898, 577);
             this.imagePanel.TabIndex = 4;
             // 
             // label2
@@ -358,17 +357,18 @@
             this.textBox1.Location = new System.Drawing.Point(0, 0);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(896, 577);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.WordWrap = false;
+            this.textBox1.ReadOnly = true;
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBox1.Size = new System.Drawing.Size(898, 577);
+            this.textBox1.TabIndex = 6;
+            this.textBox1.Visible = false;
             // 
             // hexEditor1
             // 
             this.hexEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.hexEditor1.Location = new System.Drawing.Point(0, 0);
             this.hexEditor1.Name = "hexEditor1";
-            this.hexEditor1.Size = new System.Drawing.Size(896, 577);
+            this.hexEditor1.Size = new System.Drawing.Size(898, 577);
             this.hexEditor1.TabIndex = 0;
             // 
             // FormMain
@@ -428,12 +428,12 @@
         private System.Windows.Forms.Panel topPreviewUiPanel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Panel previewPanel;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ToolStripMenuItem cATFileToolStripMenuItem;
         private HexEditor hexEditor1;
         private System.Windows.Forms.ComboBox previewModeComboBox;
         private System.Windows.Forms.ComboBox paletteComboBox;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 

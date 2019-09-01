@@ -10,6 +10,7 @@ namespace ShandalarImageToolbox
 {
     public class CatFile
     {
+        public string name;
         public UInt32 hash;
         public byte[] data;
     }
@@ -86,13 +87,20 @@ namespace ShandalarImageToolbox
 
             file.hash = entry.hash;
             file.data = new byte[entry.size];
-
+            
             for (int i=0; i<entry.size; i++)
             {
                 file.data[i] = catImage[entry.fileOffset + i];
             }
+            int offset = 8;
+            while (file.data[offset] != 0 && file.data[offset] != 2)
+            {
+                file.name += (char)file.data[offset];
+                offset++;
+            }
 
-            return file;
+
+                return file;
         }
 
     }

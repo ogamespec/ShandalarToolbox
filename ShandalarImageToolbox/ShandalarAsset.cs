@@ -22,7 +22,7 @@ namespace ShandalarImageToolbox
             this.imageType = imageType;
         }
         public ImageType imageType;
-        public string filename;
+        public string filename, parentName;
         public byte[] data;
         public Bitmap image;
         public int childIndex;
