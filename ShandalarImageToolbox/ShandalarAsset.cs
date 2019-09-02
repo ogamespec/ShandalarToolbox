@@ -26,6 +26,7 @@ namespace ShandalarImageToolbox
         public byte[] data;
         public Bitmap image;
         public int childIndex;
+        public bool hasEmbeddedPalette;
 
 
     }

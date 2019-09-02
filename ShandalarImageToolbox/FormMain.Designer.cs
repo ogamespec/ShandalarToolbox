@@ -59,6 +59,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.hexEditor1 = new ShandalarImageToolbox.HexEditor();
+            this.useLastEmbeddedPaletteCheckbox = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -270,13 +271,14 @@
             // 
             this.topPreviewUiPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.topPreviewUiPanel.Controls.Add(this.useLastEmbeddedPaletteCheckbox);
             this.topPreviewUiPanel.Controls.Add(this.paletteComboBox);
             this.topPreviewUiPanel.Controls.Add(this.label1);
             this.topPreviewUiPanel.Controls.Add(this.previewModeComboBox);
             this.topPreviewUiPanel.Location = new System.Drawing.Point(0, 0);
             this.topPreviewUiPanel.Margin = new System.Windows.Forms.Padding(0);
             this.topPreviewUiPanel.Name = "topPreviewUiPanel";
-            this.topPreviewUiPanel.Size = new System.Drawing.Size(896, 29);
+            this.topPreviewUiPanel.Size = new System.Drawing.Size(897, 29);
             this.topPreviewUiPanel.TabIndex = 3;
             // 
             // paletteComboBox
@@ -324,7 +326,7 @@
             this.previewPanel.Location = new System.Drawing.Point(0, 32);
             this.previewPanel.Margin = new System.Windows.Forms.Padding(2);
             this.previewPanel.Name = "previewPanel";
-            this.previewPanel.Size = new System.Drawing.Size(898, 577);
+            this.previewPanel.Size = new System.Drawing.Size(899, 577);
             this.previewPanel.TabIndex = 5;
             // 
             // imagePanel
@@ -337,7 +339,7 @@
             this.imagePanel.Location = new System.Drawing.Point(0, 0);
             this.imagePanel.Margin = new System.Windows.Forms.Padding(0);
             this.imagePanel.Name = "imagePanel";
-            this.imagePanel.Size = new System.Drawing.Size(898, 577);
+            this.imagePanel.Size = new System.Drawing.Size(899, 577);
             this.imagePanel.TabIndex = 4;
             // 
             // label2
@@ -359,7 +361,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(898, 577);
+            this.textBox1.Size = new System.Drawing.Size(899, 577);
             this.textBox1.TabIndex = 6;
             this.textBox1.Visible = false;
             // 
@@ -368,8 +370,21 @@
             this.hexEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.hexEditor1.Location = new System.Drawing.Point(0, 0);
             this.hexEditor1.Name = "hexEditor1";
-            this.hexEditor1.Size = new System.Drawing.Size(898, 577);
+            this.hexEditor1.Size = new System.Drawing.Size(899, 577);
             this.hexEditor1.TabIndex = 0;
+            // 
+            // useLastEmbeddedPaletteCheckbox
+            // 
+            this.useLastEmbeddedPaletteCheckbox.AutoSize = true;
+            this.useLastEmbeddedPaletteCheckbox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.useLastEmbeddedPaletteCheckbox.Enabled = false;
+            this.useLastEmbeddedPaletteCheckbox.Location = new System.Drawing.Point(283, 5);
+            this.useLastEmbeddedPaletteCheckbox.Name = "useLastEmbeddedPaletteCheckbox";
+            this.useLastEmbeddedPaletteCheckbox.Size = new System.Drawing.Size(152, 17);
+            this.useLastEmbeddedPaletteCheckbox.TabIndex = 10;
+            this.useLastEmbeddedPaletteCheckbox.Text = "Use last embedded palette";
+            this.useLastEmbeddedPaletteCheckbox.UseVisualStyleBackColor = true;
+            this.useLastEmbeddedPaletteCheckbox.CheckedChanged += new System.EventHandler(this.UseLastEmbeddedPaletteCheckbox_CheckedChanged);
             // 
             // FormMain
             // 
@@ -434,6 +449,7 @@
         private System.Windows.Forms.ComboBox paletteComboBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.CheckBox useLastEmbeddedPaletteCheckbox;
     }
 }
 

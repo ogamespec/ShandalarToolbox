@@ -22,6 +22,7 @@ namespace ShandalarImageToolbox
         static extern bool AllocConsole();
 
         private List<Color[]> palettes = new List<Color[]>();
+        public Color[] lastEmbeddedPalette;
  
 
        
@@ -29,6 +30,7 @@ namespace ShandalarImageToolbox
         public int loadedImageIndex;
         public string windowTitle;
         public int selectedPaletteIndex;
+        public bool useLastEmbeddedPalette;
         public FormMain()
         {
             
@@ -135,13 +137,18 @@ namespace ShandalarImageToolbox
 
            byte[,] imageData = new byte[decoder.width,decoder.height];
             decoder.DecodeImage(imageData);
-
+            if (decoder.hasPalette)
+            {
+                useLastEmbeddedPaletteCheckbox.Enabled = true;
+                lastEmbeddedPalette = decoder.embeddedPalette;
+            }
             for (int y = 0; y < decoder.height; y++)
             {
                 for (int x = 0; x < decoder.width; x++)
                 {
                     byte value = imageData[x,y];
                     Color color = palettes[selectedPaletteIndex][value];
+                    if (useLastEmbeddedPalette && lastEmbeddedPalette != null) color = lastEmbeddedPalette[value];
                     if (color == Color.Transparent)
                     {
                         if (name.Contains("Cardart")) color = Color.Black; //The Cardart pic files have a strange palette difference
@@ -155,6 +162,7 @@ namespace ShandalarImageToolbox
             ShandalarAsset asset = new ShandalarAsset(Path.GetFileNameWithoutExtension(name), data, ImageType.Pic);
             asset.image = bitmap;
             asset.imageType = ImageType.Pic;
+            asset.hasEmbeddedPalette = decoder.hasPalette;
             ClearImagePanel();
             return asset;
 
@@ -173,7 +181,8 @@ namespace ShandalarImageToolbox
                 Text = windowTitle + " - " + Path.GetFileName(openFileDialog.FileName);
                 string loadedImageFilename = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
                 Console.WriteLine("Loaded file path: " + openFileDialog.FileName);
-                List<Bitmap> sprites = SprDecoder.GetSprites(data, palettes[selectedPaletteIndex]).ToList();
+                Color[] palette = useLastEmbeddedPalette && lastEmbeddedPalette != null ? lastEmbeddedPalette : palettes[selectedPaletteIndex];
+                List<Bitmap> sprites = SprDecoder.GetSprites(data, palette).ToList();
                 ClearImagePanel();
                 assetsListBox.Items.Clear();
                 loadedImages.Clear();
@@ -222,8 +231,19 @@ namespace ShandalarImageToolbox
         }
         public void ShowImage(Bitmap imageTexture)
         {
+            ShandalarAsset image = loadedImages[loadedImageIndex];
             imagePanel.BackgroundImage = imageTexture;
-            label2.Text = "Width: " + imageTexture.Width + "\n" + "Height: " + imageTexture.Height;
+            switch (image.imageType)
+            {
+                case ImageType.Pic:
+                    label2.Text = "Width: " + imageTexture.Width + "\nHeight: " + imageTexture.Height + "\nHas Embedded Palette:" + image.hasEmbeddedPalette;
+                    break;
+                default:
+                    label2.Text = "Width: " + imageTexture.Width + "\n" + "Height: " + imageTexture.Height;
+                    break;
+
+            }
+            
             if (imageTexture.Width > imagePanel.Width || imageTexture.Height > imagePanel.Height)
                 imagePanel.BackgroundImageLayout = ImageLayout.Zoom;
             else
@@ -405,6 +425,34 @@ namespace ShandalarImageToolbox
                 ShowImage(loadedImages[loadedImageIndex].image);
 
             }
+        }
+
+        private void UseLastEmbeddedPaletteCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            useLastEmbeddedPalette = useLastEmbeddedPaletteCheckbox.Checked;
+            Color[] palette = useLastEmbeddedPalette ? lastEmbeddedPalette : palettes[selectedPaletteIndex];
+            if (loadedImages.Count > 0 && loadedImages[loadedImageIndex].data != null)
+            {
+                foreach (ShandalarAsset asset in loadedImages)
+                {
+                    switch (asset.imageType)
+                    {
+                        case ImageType.Pic:
+                            asset.image = GetPic(asset.data, asset.filename).image;
+                            break;
+                        case ImageType.Spr:
+                            List<Bitmap> sprites = SprDecoder.GetSprites(loadedImages[loadedImageIndex].data, palette);
+                            asset.image = sprites[asset.childIndex];
+                            break;
+
+
+                    }
+                }
+
+                ShowImage(loadedImages[loadedImageIndex].image);
+
+            }
+
         }
     }
 

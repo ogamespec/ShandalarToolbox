@@ -85,6 +85,7 @@ namespace ShandalarImageToolbox
                     gValue = Convert.ToByte(gStr);
                     bValue = Convert.ToByte(bStr);
                     Palette[index] = Color.FromArgb(rValue, gValue, bValue);
+                    if (Palette[index] == Color.FromArgb(255, 0, 255)) Palette[index] = Color.FromArgb(index, index, index);
                 }
                 else
                 {
