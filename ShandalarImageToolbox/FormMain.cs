@@ -161,7 +161,6 @@ namespace ShandalarImageToolbox
             palettes[selectedPaletteIndex] = originalPalette;
             ShandalarAsset asset = new ShandalarAsset(Path.GetFileNameWithoutExtension(name), data, ImageType.Pic);
             asset.image = bitmap;
-            asset.imageType = ImageType.Pic;
             asset.hasEmbeddedPalette = decoder.hasPalette;
             ClearImagePanel();
             return asset;
@@ -362,12 +361,74 @@ namespace ShandalarImageToolbox
         private void AssetsListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             loadedImageIndex = assetsListBox.SelectedIndex;
-            if(loadedImageIndex != -1 && loadedImages[assetsListBox.SelectedIndex].image != null) ShowImage(loadedImages[assetsListBox.SelectedIndex].image);
-            string fileText = Encoding.UTF8.GetString(loadedImages[assetsListBox.SelectedIndex].data);
-            string tempText = Regex.Replace(fileText, @"\p{C}+", string.Empty);
-            hexEditor1.LoadData(loadedImages[assetsListBox.SelectedIndex].data);
-            if(tempText != fileText)
-            textBox1.Text = fileText;
+            if (loadedImageIndex != -1) {
+                ShandalarAsset asset = loadedImages[loadedImageIndex];
+                if(loadedImages[assetsListBox.SelectedIndex].image != null) ShowImage(asset.image);
+                string fileText = Encoding.UTF8.GetString(asset.data);
+                string tempText = Regex.Replace(fileText, @"\p{C}+", string.Empty);
+                hexEditor1.LoadData(asset.data);
+                if (tempText != fileText)
+                    textBox1.Text = fileText;
+                if (asset.imageType == ImageType.Cat)
+                {
+                    byte[] uncompressedData = Vlc.VlcDecompress(asset.data);
+                    File.WriteAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads/uncompressedWvl.bin", uncompressedData);
+                    /*
+
+                        int width = (int)BitConverter.ToUInt32(uncompressedData , 0x1c);
+                    int height = (int)BitConverter.ToUInt32(uncompressedData , 0x20);
+                    int smallTableSize = (int)BitConverter.ToUInt32(uncompressedData,0x24);
+
+                    int var_14;
+                    int var_24;
+
+                    if ((int)BitConverter.ToUInt32(uncompressedData,0)!=0)
+                    {
+                        /// var_14
+                        int eax = width;
+                        int ecx = (int)BitConverter.ToUInt32(uncompressedData , 0x28) - 1;
+                        if (ecx == 0)
+                            var_14 = eax / 2;
+                        else
+                            var_14 = eax;
+
+                        /// var_24
+                        eax = height;
+                        ecx = (int)BitConverter.ToUInt32(uncompressedData ,0x28) - 1;
+                        if (ecx == 0)
+                            var_24 = eax / 2;
+                        else
+                            var_24 = eax;
+                    }
+                    else
+                    {
+                        var_14 = width;
+                        var_24 = height;
+                    }
+
+                    byte* ptr1 = dest;
+                    byte* ptr2 = ptr1 + width * width * 4 + 0x80;
+                    byte* ptr3 = ptr2 + var_14 * var_14 * 4 + 0x80;
+
+                    WaveletDecode((int*)ptr1, width, smallTableSize);
+                    WaveletDecode((int*)ptr2, var_14, smallTableSize);
+                    WaveletDecode((int*)ptr3, var_14, smallTableSize);
+
+                	/// YCbCr -> RGB
+
+	uint8_t * rgbBuf = Decode_YCbCrToRGB(nullptr,
+		(int32_t *)ptr1,
+		width,
+		height,
+		(int32_t *)ptr2,
+		(int32_t *)ptr3,
+		var_14,
+		var_24);
+
+	/// Save image
+                    */
+                }
+            }
 
         }
 

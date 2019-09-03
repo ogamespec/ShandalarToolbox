@@ -98,9 +98,10 @@ namespace ShandalarImageToolbox
                 file.name += (char)file.data[offset];
                 offset++;
             }
+            if (file.name[0] == 'c' || file.name[0] == 'C') file.name = file.name.Substring(1);
 
 
-                return file;
+            return file;
         }
 
     }

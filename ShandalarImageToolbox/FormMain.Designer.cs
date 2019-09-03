@@ -47,10 +47,12 @@
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.assetsListBox = new System.Windows.Forms.ListBox();
             this.topPreviewUiPanel = new System.Windows.Forms.Panel();
+            this.useLastEmbeddedPaletteCheckbox = new System.Windows.Forms.CheckBox();
             this.paletteComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.previewModeComboBox = new System.Windows.Forms.ComboBox();
@@ -59,7 +61,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.hexEditor1 = new ShandalarImageToolbox.HexEditor();
-            this.useLastEmbeddedPaletteCheckbox = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -220,6 +221,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.progressBar1);
             this.splitContainer1.Panel1.Controls.Add(this.tabControl1);
             this.splitContainer1.Panel1MinSize = 200;
             // 
@@ -229,19 +231,29 @@
             this.splitContainer1.Panel2.Controls.Add(this.previewPanel);
             this.splitContainer1.Panel2MinSize = 400;
             this.splitContainer1.Size = new System.Drawing.Size(1268, 617);
-            this.splitContainer1.SplitterDistance = 374;
+            this.splitContainer1.SplitterDistance = 512;
             this.splitContainer1.SplitterWidth = 3;
             this.splitContainer1.TabIndex = 6;
             // 
+            // progressBar1
+            // 
+            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar1.Location = new System.Drawing.Point(3, 592);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(504, 20);
+            this.progressBar1.TabIndex = 1;
+            // 
             // tabControl1
             // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(2);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(372, 615);
+            this.tabControl1.Size = new System.Drawing.Size(510, 596);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
@@ -251,7 +263,7 @@
             this.tabPage1.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(2);
-            this.tabPage1.Size = new System.Drawing.Size(364, 589);
+            this.tabPage1.Size = new System.Drawing.Size(502, 570);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Files List";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -263,7 +275,7 @@
             this.assetsListBox.Location = new System.Drawing.Point(2, 2);
             this.assetsListBox.Margin = new System.Windows.Forms.Padding(2);
             this.assetsListBox.Name = "assetsListBox";
-            this.assetsListBox.Size = new System.Drawing.Size(360, 585);
+            this.assetsListBox.Size = new System.Drawing.Size(498, 566);
             this.assetsListBox.TabIndex = 0;
             this.assetsListBox.SelectedIndexChanged += new System.EventHandler(this.AssetsListBox_SelectedIndexChanged);
             // 
@@ -278,8 +290,21 @@
             this.topPreviewUiPanel.Location = new System.Drawing.Point(0, 0);
             this.topPreviewUiPanel.Margin = new System.Windows.Forms.Padding(0);
             this.topPreviewUiPanel.Name = "topPreviewUiPanel";
-            this.topPreviewUiPanel.Size = new System.Drawing.Size(897, 29);
+            this.topPreviewUiPanel.Size = new System.Drawing.Size(1179, 29);
             this.topPreviewUiPanel.TabIndex = 3;
+            // 
+            // useLastEmbeddedPaletteCheckbox
+            // 
+            this.useLastEmbeddedPaletteCheckbox.AutoSize = true;
+            this.useLastEmbeddedPaletteCheckbox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.useLastEmbeddedPaletteCheckbox.Enabled = false;
+            this.useLastEmbeddedPaletteCheckbox.Location = new System.Drawing.Point(283, 5);
+            this.useLastEmbeddedPaletteCheckbox.Name = "useLastEmbeddedPaletteCheckbox";
+            this.useLastEmbeddedPaletteCheckbox.Size = new System.Drawing.Size(152, 17);
+            this.useLastEmbeddedPaletteCheckbox.TabIndex = 10;
+            this.useLastEmbeddedPaletteCheckbox.Text = "Use last embedded palette";
+            this.useLastEmbeddedPaletteCheckbox.UseVisualStyleBackColor = true;
+            this.useLastEmbeddedPaletteCheckbox.CheckedChanged += new System.EventHandler(this.UseLastEmbeddedPaletteCheckbox_CheckedChanged);
             // 
             // paletteComboBox
             // 
@@ -323,10 +348,10 @@
             this.previewPanel.Controls.Add(this.imagePanel);
             this.previewPanel.Controls.Add(this.textBox1);
             this.previewPanel.Controls.Add(this.hexEditor1);
-            this.previewPanel.Location = new System.Drawing.Point(0, 32);
+            this.previewPanel.Location = new System.Drawing.Point(0, 28);
             this.previewPanel.Margin = new System.Windows.Forms.Padding(2);
             this.previewPanel.Name = "previewPanel";
-            this.previewPanel.Size = new System.Drawing.Size(899, 577);
+            this.previewPanel.Size = new System.Drawing.Size(753, 588);
             this.previewPanel.TabIndex = 5;
             // 
             // imagePanel
@@ -339,7 +364,7 @@
             this.imagePanel.Location = new System.Drawing.Point(0, 0);
             this.imagePanel.Margin = new System.Windows.Forms.Padding(0);
             this.imagePanel.Name = "imagePanel";
-            this.imagePanel.Size = new System.Drawing.Size(899, 577);
+            this.imagePanel.Size = new System.Drawing.Size(753, 588);
             this.imagePanel.TabIndex = 4;
             // 
             // label2
@@ -361,7 +386,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(899, 577);
+            this.textBox1.Size = new System.Drawing.Size(753, 588);
             this.textBox1.TabIndex = 6;
             this.textBox1.Visible = false;
             // 
@@ -370,21 +395,8 @@
             this.hexEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.hexEditor1.Location = new System.Drawing.Point(0, 0);
             this.hexEditor1.Name = "hexEditor1";
-            this.hexEditor1.Size = new System.Drawing.Size(899, 577);
+            this.hexEditor1.Size = new System.Drawing.Size(753, 588);
             this.hexEditor1.TabIndex = 0;
-            // 
-            // useLastEmbeddedPaletteCheckbox
-            // 
-            this.useLastEmbeddedPaletteCheckbox.AutoSize = true;
-            this.useLastEmbeddedPaletteCheckbox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.useLastEmbeddedPaletteCheckbox.Enabled = false;
-            this.useLastEmbeddedPaletteCheckbox.Location = new System.Drawing.Point(283, 5);
-            this.useLastEmbeddedPaletteCheckbox.Name = "useLastEmbeddedPaletteCheckbox";
-            this.useLastEmbeddedPaletteCheckbox.Size = new System.Drawing.Size(152, 17);
-            this.useLastEmbeddedPaletteCheckbox.TabIndex = 10;
-            this.useLastEmbeddedPaletteCheckbox.Text = "Use last embedded palette";
-            this.useLastEmbeddedPaletteCheckbox.UseVisualStyleBackColor = true;
-            this.useLastEmbeddedPaletteCheckbox.CheckedChanged += new System.EventHandler(this.UseLastEmbeddedPaletteCheckbox_CheckedChanged);
             // 
             // FormMain
             // 
@@ -450,6 +462,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.CheckBox useLastEmbeddedPaletteCheckbox;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }
 
