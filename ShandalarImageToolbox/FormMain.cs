@@ -132,6 +132,7 @@ namespace ShandalarImageToolbox
            if(decoder.hasPalette) palettes[selectedPaletteIndex] = decoder.embeddedPalette;
 
             /// Output image as picture box
+            
 
             Bitmap bitmap = new Bitmap(decoder.width, decoder.height);
 
@@ -146,22 +147,39 @@ namespace ShandalarImageToolbox
             {
                 for (int x = 0; x < decoder.width; x++)
                 {
-                    byte value = imageData[x,y];
+                    byte value = imageData[x, y];
                     Color color = palettes[selectedPaletteIndex][value];
                     if (useLastEmbeddedPalette && lastEmbeddedPalette != null) color = lastEmbeddedPalette[value];
                     if (color == Color.Transparent)
                     {
-                        if (name.Contains("Cardart")) color = Color.Black; //The Cardart pic files have a strange palette difference
+                        if (name.Contains("Cardart") || name.Contains("Duelart") || name.Contains("Exp1art")) color = Color.Black; //The Cardart pic files have a strange palette difference
                         else color = Color.FromArgb(value, value, value);
                     }
                     bitmap.SetPixel(x, y, color);
 
                 }
             }
-            palettes[selectedPaletteIndex] = originalPalette;
-            ShandalarAsset asset = new ShandalarAsset(Path.GetFileNameWithoutExtension(name), data, ImageType.Pic);
+            ShandalarAsset asset = new ShandalarAsset(name, data, ImageType.Pic);
             asset.image = bitmap;
+            if (asset.filePath.Contains("Rogue") || asset.filePath.Contains("Faces") || asset.filePath.Contains("Playface")) //Combine the embedded alpha channel with the main image for the face sprites
+            {
+                Bitmap transparentSprite = new Bitmap(asset.image.Width / 2, asset.image.Height);
+                for(int x = 0; x < asset.image.Width/2; x++)
+                {
+                    for(int y = 0; y < asset.image.Height; y++)
+                    {
+                         byte paletteIndex = imageData[x + asset.image.Width/2, y];
+                        Color color = palettes[selectedPaletteIndex][paletteIndex];
+                        if ((paletteIndex == 0)) transparentSprite.SetPixel(x, y, asset.image.GetPixel(x, y));
+                        else transparentSprite.SetPixel(x, y, Color.Transparent);
+                       
+                    }
+                }
+                asset.image = transparentSprite;
+            }
+            palettes[selectedPaletteIndex] = originalPalette;
             asset.hasEmbeddedPalette = decoder.hasPalette;
+            asset.filename = Path.GetFileNameWithoutExtension(asset.filePath);
             ClearImagePanel();
             return asset;
 
@@ -187,10 +205,11 @@ namespace ShandalarImageToolbox
                 loadedImages.Clear();
                 for(int i = 0; i < sprites.Count; i++)
                 {
-                    ShandalarAsset asset = new ShandalarAsset(loadedImageFilename + "_" + i, data,ImageType.Spr);
+                    ShandalarAsset asset = new ShandalarAsset(loadedImageFilename, data,ImageType.Spr);
                     asset.image = sprites[i];
                     asset.childIndex = i;
                     asset.parentName = loadedImageFilename;
+                    asset.filename = Path.GetFileNameWithoutExtension(asset.filePath) + "_" + i;
                     loadedImages.Add(asset);
                 }
                 for (int i = 0; i < loadedImages.Count; i++)
@@ -217,11 +236,12 @@ namespace ShandalarImageToolbox
                 loadedImages.Clear();
                 for (int i = 0; i < cat.files.Count; i++)
                 {
-                    string name = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
+                    string filepath = openFileDialog.FileName;
                     assetsListBox.Items.Add(cat.files[i].name);
-                    ShandalarAsset asset = new ShandalarAsset(cat.files[i].name, cat.files[i].data, ImageType.Cat);
+                    ShandalarAsset asset = new ShandalarAsset(filepath, cat.files[i].data, ImageType.Cat);
                     asset.childIndex = i;
-                    asset.parentName = name;
+                    asset.parentName = filepath;
+                    asset.filename = cat.files[i].name;
                     loadedImages.Add(asset);
                 }
             }
@@ -319,17 +339,17 @@ namespace ShandalarImageToolbox
 
                     switch (loadedImages[i].imageType) {
                         case ImageType.Pic:
-                        imagesDirectory = openFolderDialog.SelectedFolder + "/extractedImages/";
+                        imagesDirectory = openFolderDialog.SelectedFolder;
                             if (!Directory.Exists(imagesDirectory)) Directory.CreateDirectory(imagesDirectory);
-                            loadedImages[i].image.Save(imagesDirectory + loadedImages[i].filename + ".png");
+                            loadedImages[i].image.Save(imagesDirectory + "/" + loadedImages[i].filename + ".png");
                         break;
                         case ImageType.Spr:
-                        imagesDirectory = openFolderDialog.SelectedFolder + "/extractedImages/" + loadedImages[i].parentName;
+                        imagesDirectory = openFolderDialog.SelectedFolder + "/" + loadedImages[i].parentName;
                         if (!Directory.Exists(imagesDirectory)) Directory.CreateDirectory(imagesDirectory);
                         loadedImages[i].image.Save(imagesDirectory + "/" + loadedImages[i].filename + ".png");
                         break;
                         case ImageType.Cat:
-                            imagesDirectory = openFolderDialog.SelectedFolder + "/extractedImages/" + loadedImages[i].parentName;
+                            imagesDirectory = openFolderDialog.SelectedFolder + "/" + loadedImages[i].parentName;
                             if (!Directory.Exists(imagesDirectory)) Directory.CreateDirectory(imagesDirectory);
                             File.WriteAllBytes(imagesDirectory + "/" + loadedImages[i].filename + ".wvl",loadedImages[i].data);
 
@@ -371,65 +391,69 @@ namespace ShandalarImageToolbox
                     textBox1.Text = fileText;
                 if (asset.imageType == ImageType.Cat)
                 {
-                    byte[] uncompressedData = Vlc.VlcDecompress(asset.data);
-                    File.WriteAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads/uncompressedWvl.bin", uncompressedData);
-                    /*
-
-                        int width = (int)BitConverter.ToUInt32(uncompressedData , 0x1c);
-                    int height = (int)BitConverter.ToUInt32(uncompressedData , 0x20);
-                    int smallTableSize = (int)BitConverter.ToUInt32(uncompressedData,0x24);
-
-                    int var_14;
-                    int var_24;
-
-                    if ((int)BitConverter.ToUInt32(uncompressedData,0)!=0)
-                    {
-                        /// var_14
-                        int eax = width;
-                        int ecx = (int)BitConverter.ToUInt32(uncompressedData , 0x28) - 1;
-                        if (ecx == 0)
-                            var_14 = eax / 2;
-                        else
-                            var_14 = eax;
-
-                        /// var_24
-                        eax = height;
-                        ecx = (int)BitConverter.ToUInt32(uncompressedData ,0x28) - 1;
-                        if (ecx == 0)
-                            var_24 = eax / 2;
-                        else
-                            var_24 = eax;
-                    }
-                    else
-                    {
-                        var_14 = width;
-                        var_24 = height;
-                    }
-
-                    byte* ptr1 = dest;
-                    byte* ptr2 = ptr1 + width * width * 4 + 0x80;
-                    byte* ptr3 = ptr2 + var_14 * var_14 * 4 + 0x80;
-
-                    WaveletDecode((int*)ptr1, width, smallTableSize);
-                    WaveletDecode((int*)ptr2, var_14, smallTableSize);
-                    WaveletDecode((int*)ptr3, var_14, smallTableSize);
-
-                	/// YCbCr -> RGB
-
-	uint8_t * rgbBuf = Decode_YCbCrToRGB(nullptr,
-		(int32_t *)ptr1,
-		width,
-		height,
-		(int32_t *)ptr2,
-		(int32_t *)ptr3,
-		var_14,
-		var_24);
-
-	/// Save image
-                    */
+                    DecodeCatImage(asset);
                 }
             }
 
+        }
+        public void DecodeCatImage(ShandalarAsset asset)
+        {
+            byte[] uncompressedData = Vlc.VlcDecompress(asset.data);
+            File.WriteAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads/uncompressedWvl.bin", uncompressedData);
+
+
+            int width = (int)BitConverter.ToUInt32(uncompressedData, 0x1c);
+            int height = (int)BitConverter.ToUInt32(uncompressedData, 0x20);
+            int smallTableSize = (int)BitConverter.ToUInt32(uncompressedData, 0x24);
+
+            int var_14;
+            int var_24;
+
+            if ((int)BitConverter.ToUInt32(uncompressedData, 0) != 0)
+            {
+                /// var_14
+                int eax = width;
+                int ecx = (int)BitConverter.ToUInt32(uncompressedData, 0x28) - 1;
+                if (ecx == 0)
+                    var_14 = eax / 2;
+                else
+                    var_14 = eax;
+
+                /// var_24
+                eax = height;
+                ecx = (int)BitConverter.ToUInt32(uncompressedData, 0x28) - 1;
+                if (ecx == 0)
+                    var_24 = eax / 2;
+                else
+                    var_24 = eax;
+            }
+            else
+            {
+                var_14 = width;
+                var_24 = height;
+            }
+
+            int ptr1 = 0;
+            int ptr2 = ptr1 + width * width * 4 + 0x80;
+            int ptr3 = ptr2 + var_14 * var_14 * 4 + 0x80;
+
+            Wavelet.WaveletDecode(ref uncompressedData, ptr1, width, smallTableSize);
+            Wavelet.WaveletDecode(ref uncompressedData, ptr2, var_14, smallTableSize);
+            Wavelet.WaveletDecode(ref uncompressedData, ptr3, var_14, smallTableSize);
+            File.WriteAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads/wvlDecodedCardImageData.bin", uncompressedData);
+            /// YCbCr -> RGB
+            /*
+byte[] rgbBuf = Wavelet.Decode_YCbCrToRGB(uncompressedData,
+ptr1,
+width,
+height,
+ptr2,
+ptr3,
+var_14,
+var_24);
+
+/// Save image
+          */
         }
 
         private void CATFileToolStripMenuItem_Click(object sender, EventArgs e)
@@ -472,7 +496,7 @@ namespace ShandalarImageToolbox
                     switch (asset.imageType)
                     {
                         case ImageType.Pic:
-                        asset.image = GetPic(asset.data, asset.filename).image;
+                        asset.image = GetPic(asset.data, asset.filePath).image;
                         break;
                         case ImageType.Spr:
                         List<Bitmap> sprites = SprDecoder.GetSprites(loadedImages[loadedImageIndex].data, palettes[selectedPaletteIndex]);

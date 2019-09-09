@@ -8,15 +8,22 @@ namespace ShandalarImageToolbox
 {
     public class Wavelet
     {
-        /*
+        
+        
         public static bool waveLetBuffersReady;
-        public static int[] waveLetBuffer_1;
-        public static int[] waveLetBuffer_2;
+        public static byte[] waveLetBuffer_1;
+        public static byte[] waveLetBuffer_2;
+        public static int buf1Index, buf2Index;
+        public static int savedCtab;
+        public static byte[] savedData;
+        public static int savedDataOffset;
 
         public static void CardWaveletDecode_Sub7(                            // 0x492410
-            int* tab1,
-            int* tab2,
-            int* tmp,
+            byte[] data,
+            int tab1,
+            int tab2,
+            ref byte[] tmp,
+            ref int tmpIndex,
             int arg_C,
             int arg_10,
             int arg_14,
@@ -25,33 +32,32 @@ namespace ShandalarImageToolbox
         {
             for (int i = 0; i < arg_10; i++)
             {
-                int* var_C = tab1;
-                int* var_10 = &tab1[arg_C];
-                int* var_8 = &tmp[arg_18 * 2];
+                int var_C = tab1;
+                int var_10 = tab1 + arg_C;
+                int var_8 = tmpIndex + arg_18 * 2;
                 tab1++;
-
                 while (tab1 < var_10)
                 {
-                    *var_8 = *tab1 + *tab2;
-                    var_8[arg_18] = *tab1 - *tab2;
+                    for (int j = 0; j < 4; j++) tmp[var_8+j] = (byte)(savedData[tab1+j] + savedData[tab2+j]);
+                    for (int j = 0; j < 4; j++) tmp[var_8+arg_18+j] = (byte)(savedData[tab1+j] - savedData[tab2+j]);
 
-                    tab1++;
-                    tab2++;
-                    var_8 += arg_18 * 2;
+                    tab1+= 4;
+                    tab2+= 4;
+                    var_8 += arg_18 * 2 * 4;
                 }
 
-                *tmp = *var_C + *tab2;
-                tmp[arg_18] = *var_C - *tab2;
+                for (int j = 0; j < 4; j++) tmp[tmpIndex+j] = (byte)(savedData[var_C+j] + savedData[tab2+j]);
+                for(int j = 0; j < 4; j++) tmp[tmpIndex + arg_18 + j] = (byte)(savedData[var_C + j] - savedData[tab2 + j]);
 
-                tmp++;
-                tab2++;
+                tmpIndex +=4;
+                tab2+=4;
             }
         }
 
         public static void CardWaveletDecode_Sub8(                    // 0x4924E5
-            int* buf1,
-            int* buf2,
-            int* outTab,
+            ref byte[] buf1,
+            ref byte[] buf2,
+            int outTab,
             int arg_C,
             int arg_10,
             int arg_14,
@@ -59,37 +65,40 @@ namespace ShandalarImageToolbox
         {
             for (int i = 0; i < arg_10; i++)
             {
-                int* var_C = buf1;
-                int* var_10 = &buf1[arg_C];
-                int* var_8 = &outTab[arg_18 * 2];
-                buf1++;
+                int var_C = buf1Index;
+                int var_10 = buf1Index + arg_C;
+                int var_8 = outTab + arg_18 * 2;
+                buf1Index++;
 
-                while (buf1 < var_10)
+                while (buf1Index < var_10)
                 {
-                    *var_8 = (*buf1 + *buf2) / 2;
-                    var_8[arg_18] = (*buf1 - *buf2) / 2;
+                    for (int j = 0; j < 4; j++) savedData[var_8+j] = (byte)((buf1[buf1Index+j] + buf2[buf2Index+j]) / 2);
+                    for (int j = 0; j < 4; j++) savedData[var_8 + arg_18+j] = (byte)((buf1[buf1Index+j] + buf2[buf2Index+j]) / 2);
 
-                    buf1++;
-                    buf2++;
+                    buf1Index++;
+                    buf2Index++;
                     var_8 += arg_18 * 2;
                 }
 
-                *outTab = (*var_C + *buf2) / 2;
-                outTab[arg_18] = (*var_C - *buf2) / 2;
+                for (int j = 0; j < 4; j++) savedData[outTab+j] = (byte)((buf1[var_C+j] + buf2[buf2Index+j]) / 2);
+                for (int j = 0; j < 4; j++) savedData[outTab+arg_18+j] = (byte)((buf1[var_C+j] - buf2[buf2Index+j]) / 2);
 
-                outTab++;
-                buf2++;
+                outTab+=4;
+                buf2Index+=4;
             }
+            savedCtab = outTab;
         }
 
-        public static void WaveletDecode(int* ctab, int width, int tabSize)                   // 0x4922CB
+        public static void WaveletDecode(ref byte[] data, int ctab, int width, int tabSize)                   // 0x4922CB
         {
-            int* buf1, *buf2;
-
+            byte[] buf1, buf2;
+            savedData = data;
             if (!waveLetBuffersReady)
             {
-                buf1 = waveLetBuffer_1 = new int[0x10000];
-                buf2 = waveLetBuffer_2 = new int[0x10000];
+                buf1 = waveLetBuffer_1 = new byte[0x40000]; //new int[0x10000];
+                buf2 = waveLetBuffer_2 = new byte[0x40000]; //new int[0x10000];
+                buf1Index = 0;
+                buf2Index = 0;
                 waveLetBuffersReady = true;
             }
             else
@@ -103,26 +112,31 @@ namespace ShandalarImageToolbox
             while (size < width)
             {
                 CardWaveletDecode_Sub7(
+                    data,
                     ctab,
-                    &ctab[size * size],
-                    buf1,
+                    size * size + ctab,
+                    ref buf1,
+                    ref buf1Index,
                     size,
                     size,
                     2 * size,       // not used
                     size);
-
+                ctab = savedCtab;
                 CardWaveletDecode_Sub7(
-                    &ctab[size * size * 2],
-                    &ctab[size * size * 3],
-                    buf2,
+                    data,
+                    size * size * 2 + ctab,
+                    size * size * 3 + ctab,
+                    ref buf2,
+                    ref buf2Index,
                     size,
                     size,
                     2 * size,       // not used
                     size);
+                ctab = savedCtab;
 
                 CardWaveletDecode_Sub8(
-                    buf1,
-                    buf2,
+                    ref buf1,
+                    ref buf2,
                     ctab,
                     size,
                     2 * size,
@@ -131,16 +145,17 @@ namespace ShandalarImageToolbox
 
                 size *= 2;
             }
+            data = savedData;
         }
 
         ///////////////////////////////////////////////////////////
 
         public static bool YCbCrTabReady;
         public static byte[] YCbCrTab = new byte[0x400 + 0x1c00];
-        public static byte* YCbCrTabPtr = &YCbCrTab[0x400];
-
+        public static int YCbCrTabPtr = 0x40;
+        /*
         public static byte[] Decode_YCbCrToRGB(                 // 0x4925E6
-            byte* rgbPtr,                    // always 0
+            byte[] data,                    // always 0
             int* YTab,
             int width,
             int height,
@@ -275,8 +290,9 @@ namespace ShandalarImageToolbox
             return buf;
         }
         */
-
-    }
+        
     
+    }
+
 }
 

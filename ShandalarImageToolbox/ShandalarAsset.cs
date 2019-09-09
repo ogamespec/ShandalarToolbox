@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.IO;
 namespace ShandalarImageToolbox
 {
     public enum ImageType
@@ -15,14 +16,14 @@ namespace ShandalarImageToolbox
 
     public class ShandalarAsset
     {
-        public ShandalarAsset(string filename, byte[] data, ImageType imageType)
+        public ShandalarAsset(string filePath, byte[] data, ImageType imageType)
         {
-            this.filename = filename;
+            this.filePath = filePath;
             this.data = data;
             this.imageType = imageType;
         }
         public ImageType imageType;
-        public string filename, parentName;
+        public string filename, parentName, filePath;
         public byte[] data;
         public Bitmap image;
         public int childIndex;

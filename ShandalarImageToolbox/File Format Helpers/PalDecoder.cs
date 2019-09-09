@@ -93,7 +93,7 @@ namespace ShandalarImageToolbox
                 }
             }
 
-
+            Palette[255] = Color.White; //workaround for images including an alpha channel not showing the alpha channel correctly
 
         }
 
