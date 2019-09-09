@@ -1,5 +1,5 @@
 # ShandalarImageToolbox
-This fork adds the ability to export to png, to open .pic files with embedded palette data and to open .spr files. It also supports viewing the wvl files inside of the cat archive files as hexadecimal, but can't convert the wvl card images yet.
+This fork adds the ability to export to png, to open .pic files with embedded palette data and to open .spr files. It also supports decompressing the wvl card image files, but can't convert them yet.
 
 Original version, and code for wvl and cat file parsing were created by https://github.com/ogamespec
 
