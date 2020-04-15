@@ -53,6 +53,15 @@ namespace ShandalarImageToolbox
             previewModeComboBox.Text = previewModeComboBox.SelectedItem.ToString();
         }
 
+        public void OpenWvlFileTest(string path)
+        {
+            byte[] data = File.ReadAllBytes(path);
+            ShandalarAsset asset = new ShandalarAsset(path, data, ImageType.Cat);
+            asset.filename = Path.GetFileName(path);
+            path = path.Replace(".tif", "").Replace(".wvl",".png"); //replace both extensions seperately, because a few card image files don't have the tif file extension
+            DecodeCatImage(asset).Save(path);
+        }
+
         public void AddPalette(string name)
         {
             palettes.Add(new Color[256]);
@@ -92,6 +101,19 @@ namespace ShandalarImageToolbox
             }
         }
 
+
+        private void SetProgressBarValue(int value)
+        {
+                progressBar1.Value = value;
+        }
+
+        private void UpdateStatusBarText(string text)
+        {
+            toolStripStatusLabel1.Text = text;
+            statusStrip1.Refresh();
+        }
+
+
         /// <summary>
         /// Load and decode .PIC image
         /// </summary>
@@ -103,10 +125,12 @@ namespace ShandalarImageToolbox
             openFileDialog.DefaultExt = "pic";
             openFileDialog.Filter = "PIC Files|*.pic|All Files|*.*";
             openFileDialog.Multiselect = true;
-            if ( openFileDialog.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
+                UpdateStatusBarText("Loading Pic file(s)...");
                 assetsListBox.Items.Clear();
                 loadedImages.Clear();
+                int index = 0;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
                     byte[] fileData = File.ReadAllBytes(fileName);
@@ -115,7 +139,11 @@ namespace ShandalarImageToolbox
                     Console.WriteLine("Loaded file path: " + fileName);
                     loadedImages.Add(GetPic(fileData, fileName));
                     assetsListBox.Items.Add(Path.GetFileNameWithoutExtension(fileName));
+                    SetProgressBarValue((int)Math.Round(100f * ((float)index / (float)openFileDialog.FileNames.Length)));
+                    index++;
                 }
+                SetProgressBarValue(0);
+                UpdateStatusBarText("Finished loading Pic file(s).");
                 exportToolStripMenuItem.Enabled = true;
                 exportAllToolStripMenuItem.Enabled = true;
             }
@@ -203,7 +231,8 @@ namespace ShandalarImageToolbox
                 ClearImagePanel();
                 assetsListBox.Items.Clear();
                 loadedImages.Clear();
-                for(int i = 0; i < sprites.Count; i++)
+                UpdateStatusBarText("Loading images from spr file...");
+                for (int i = 0; i < sprites.Count; i++)
                 {
                     ShandalarAsset asset = new ShandalarAsset(loadedImageFilename, data,ImageType.Spr);
                     asset.image = sprites[i];
@@ -211,11 +240,14 @@ namespace ShandalarImageToolbox
                     asset.parentName = loadedImageFilename;
                     asset.filename = Path.GetFileNameWithoutExtension(asset.filePath) + "_" + i;
                     loadedImages.Add(asset);
+                    SetProgressBarValue((int)Math.Round(100f * ((float)i / (float)sprites.Count)));
                 }
                 for (int i = 0; i < loadedImages.Count; i++)
                 {
                     assetsListBox.Items.Add(loadedImageFilename + "_" +i);
                 }
+                SetProgressBarValue(0);
+                UpdateStatusBarText("Finished loading images from spr file.");
                 exportToolStripMenuItem.Enabled = true;
                 exportAllToolStripMenuItem.Enabled = true;
                 
@@ -224,6 +256,7 @@ namespace ShandalarImageToolbox
             }
 
         }
+
         private void LoadCATFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -234,16 +267,21 @@ namespace ShandalarImageToolbox
                 Cat cat = new Cat(openFileDialog.FileName);
                 assetsListBox.Items.Clear();
                 loadedImages.Clear();
+                UpdateStatusBarText("Loading CAT file...");
                 for (int i = 0; i < cat.files.Count; i++)
                 {
-                    string filepath = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
-                    assetsListBox.Items.Add(cat.files[i].name);
+                    string filepath = Path.GetFileNameWithoutExtension(openFileDialog.FileName);         
                     ShandalarAsset asset = new ShandalarAsset(filepath, cat.files[i].data, ImageType.Cat);
                     asset.childIndex = i;
                     asset.parentName = filepath;
                     asset.filename = cat.files[i].name;
+                    asset.image = DecodeCatImage(asset);
+                    assetsListBox.Items.Add(cat.files[i].name);
                     loadedImages.Add(asset);
+                    SetProgressBarValue((int)Math.Round(100f * ((float)i / (float)cat.files.Count)));
                 }
+                SetProgressBarValue(0);
+                UpdateStatusBarText("Finished loading CAT file.");
             }
             exportToolStripMenuItem.Enabled = true;
             exportAllToolStripMenuItem.Enabled = true;
@@ -333,7 +371,7 @@ namespace ShandalarImageToolbox
             if (openFolderDialog.ShowDialog(this) == DialogResult.OK)
             {
                 string imagesDirectory;
-
+                UpdateStatusBarText("Exporting " + loadedImages.Count + " images...");
                 for (int i = 0; i < loadedImages.Count; i++)
                 {
 
@@ -351,16 +389,16 @@ namespace ShandalarImageToolbox
                         case ImageType.Cat:
                             imagesDirectory = openFolderDialog.SelectedFolder + "/" + loadedImages[i].parentName;
                             if (!Directory.Exists(imagesDirectory)) Directory.CreateDirectory(imagesDirectory);
-                            File.WriteAllBytes(imagesDirectory + "/" + loadedImages[i].filename + ".wvl",loadedImages[i].data);
+                            //Some of the card images don't have the tif file extension (like snakeCounter), so remove the old file extension first if present
+                            //File.WriteAllBytes(imagesDirectory + "/" + loadedImages[i].filename.Replace(".tif","") + ".wvl",loadedImages[i].data);
+                            loadedImages[i].image.Save(imagesDirectory + "/" + loadedImages[i].filename.Replace(".tif","") + ".png");
 
                             break;
                     }
-
-
+                    SetProgressBarValue((int)Math.Round(100f * ((float)i / (float)loadedImages.Count)));
                 }
-                
-
-                Console.WriteLine("Finished exporting all images.");
+                SetProgressBarValue(0); //Reset the progress bar
+                UpdateStatusBarText("Finished exporting all images.");
             }
 
         }
@@ -376,11 +414,8 @@ namespace ShandalarImageToolbox
         }
 
 
-
-
         private void AssetsListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Console.WriteLine("New selection! " + System.DateTime.Now.ToString());
             loadedImageIndex = assetsListBox.SelectedIndex;
             if (loadedImageIndex != -1) {
                 ShandalarAsset asset = loadedImages[loadedImageIndex];
@@ -390,15 +425,17 @@ namespace ShandalarImageToolbox
                 hexEditor1.LoadData(asset.data);
                 if (tempText != fileText)
                     textBox1.Text = fileText;
-                if (asset.imageType == ImageType.Cat)
+                if(asset.imageType == ImageType.Cat && loadedImages[assetsListBox.SelectedIndex].image == null)
                 {
-                    DecodeCatImage(asset);
+                    asset.image = DecodeCatImage(asset);
+                    ShowImage(asset.image);
                 }
             }
-
         }
-        public void DecodeCatImage(ShandalarAsset asset)
+
+        public Bitmap DecodeCatImage(ShandalarAsset asset)
         {
+            //Console.WriteLine("Decompressing " + asset.filename);
             byte[] uncompressedData = Vlc.VlcDecompress(asset.data);
 
             int width = (int)BitConverter.ToUInt32(asset.data, 0x1c);
@@ -452,9 +489,9 @@ namespace ShandalarImageToolbox
             var_14,
             var_24);
 
-            // Save image
-            //outputImage.Save(downloadsPath + "wvlDecodedCardImage.png");
-            asset.image = outputImage;
+            // Return image
+            return outputImage;
+
             ShowImage(outputImage);
         }
 
@@ -493,6 +530,8 @@ namespace ShandalarImageToolbox
             selectedPaletteIndex = paletteComboBox.SelectedIndex;
             if (loadedImages.Count > 0 && loadedImages[loadedImageIndex].data != null)
             {
+                //Reload all the images using the new palette
+                int index = 0;
                 foreach (ShandalarAsset asset in loadedImages)
                 {
                     switch (asset.imageType)
@@ -507,7 +546,10 @@ namespace ShandalarImageToolbox
 
 
                     }
+                    SetProgressBarValue((int)Math.Round(100f * ((float)index / (float)loadedImages.Count)));
+                    index++;
                 }
+                SetProgressBarValue(0);
 
                 ShowImage(loadedImages[loadedImageIndex].image);
 
@@ -520,6 +562,8 @@ namespace ShandalarImageToolbox
             Color[] palette = useLastEmbeddedPalette ? lastEmbeddedPalette : palettes[selectedPaletteIndex];
             if (loadedImages.Count > 0 && loadedImages[loadedImageIndex].data != null)
             {
+                //Reload all the images using the new palette
+                int index = 0;
                 foreach (ShandalarAsset asset in loadedImages)
                 {
                     switch (asset.imageType)
@@ -534,7 +578,10 @@ namespace ShandalarImageToolbox
 
 
                     }
+                    SetProgressBarValue((int)Math.Round(100f * ((float)index / (float)loadedImages.Count)));
+                    index++;
                 }
+                SetProgressBarValue(0);
 
                 ShowImage(loadedImages[loadedImageIndex].image);
 

@@ -60,6 +60,8 @@
             this.imagePanel = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.hexEditor1 = new ShandalarImageToolbox.HexEditor();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -71,6 +73,7 @@
             this.topPreviewUiPanel.SuspendLayout();
             this.previewPanel.SuspendLayout();
             this.imagePanel.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -290,7 +293,7 @@
             this.topPreviewUiPanel.Location = new System.Drawing.Point(0, 0);
             this.topPreviewUiPanel.Margin = new System.Windows.Forms.Padding(0);
             this.topPreviewUiPanel.Name = "topPreviewUiPanel";
-            this.topPreviewUiPanel.Size = new System.Drawing.Size(1179, 29);
+            this.topPreviewUiPanel.Size = new System.Drawing.Size(1180, 29);
             this.topPreviewUiPanel.TabIndex = 3;
             // 
             // useLastEmbeddedPaletteCheckbox
@@ -346,12 +349,13 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.previewPanel.Controls.Add(this.imagePanel);
+            this.previewPanel.Controls.Add(this.statusStrip1);
             this.previewPanel.Controls.Add(this.textBox1);
             this.previewPanel.Controls.Add(this.hexEditor1);
             this.previewPanel.Location = new System.Drawing.Point(0, 28);
             this.previewPanel.Margin = new System.Windows.Forms.Padding(2);
             this.previewPanel.Name = "previewPanel";
-            this.previewPanel.Size = new System.Drawing.Size(753, 588);
+            this.previewPanel.Size = new System.Drawing.Size(754, 588);
             this.previewPanel.TabIndex = 5;
             // 
             // imagePanel
@@ -364,7 +368,7 @@
             this.imagePanel.Location = new System.Drawing.Point(0, 0);
             this.imagePanel.Margin = new System.Windows.Forms.Padding(0);
             this.imagePanel.Name = "imagePanel";
-            this.imagePanel.Size = new System.Drawing.Size(753, 588);
+            this.imagePanel.Size = new System.Drawing.Size(754, 566);
             this.imagePanel.TabIndex = 4;
             // 
             // label2
@@ -386,16 +390,31 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(753, 588);
+            this.textBox1.Size = new System.Drawing.Size(754, 588);
             this.textBox1.TabIndex = 6;
             this.textBox1.Visible = false;
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 566);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(754, 22);
+            this.statusStrip1.TabIndex = 6;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
             // 
             // hexEditor1
             // 
             this.hexEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.hexEditor1.Location = new System.Drawing.Point(0, 0);
             this.hexEditor1.Name = "hexEditor1";
-            this.hexEditor1.Size = new System.Drawing.Size(753, 588);
+            this.hexEditor1.Size = new System.Drawing.Size(754, 588);
             this.hexEditor1.TabIndex = 0;
             // 
             // FormMain
@@ -425,6 +444,8 @@
             this.previewPanel.PerformLayout();
             this.imagePanel.ResumeLayout(false);
             this.imagePanel.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -463,6 +484,8 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.CheckBox useLastEmbeddedPaletteCheckbox;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
     }
 }
 

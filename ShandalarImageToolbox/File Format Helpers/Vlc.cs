@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.IO; //remove later
 
 namespace ShandalarImageToolbox
 {
@@ -15,6 +16,8 @@ namespace ShandalarImageToolbox
         public static int bitstreamLimit;
         public static uint bitsDword;
         public static uint[] bitsDwordMask = new uint[32];
+
+        public static bool debug = false;
 
 
         public static int Tab1Count;
@@ -88,8 +91,20 @@ public static Tab2Entry[] Tab2 = new Tab2Entry[0x100];
             {
                 if ((bitstreamStart - bitstreamPtr) < bitstreamLimit)
                 {
-                    bitsDword = BitConverter.ToUInt32(bitstream,bitstreamPtr);
-                    bitstreamPtr += 4;
+                    int bytesLeft = bitstreamLimit - (bitstreamPtr - bitstreamStart);
+                    if (bytesLeft < 4)
+                    {
+                        for (int i = 0; i < bytesLeft; i++)
+                        {
+                            bitsDword += (uint)(bitstream[bitstreamPtr + i] << i * 8);
+                        }
+                        bitstreamPtr += bytesLeft;
+                    }
+                    else
+                    {
+                        bitsDword = BitConverter.ToUInt32(bitstream, bitstreamPtr);
+                        bitstreamPtr += 4;
+                    }
                     bitsLeft = 32;
                 }
                 else
@@ -290,7 +305,7 @@ public static Tab2Entry[] Tab2 = new Tab2Entry[0x100];
 
             Vlc_GenTab2(Tab1Count);
 
-            //DumpTab2();
+           //DumpTab2();
 
             return (bitsProcessed + 7) / 8;
         }
@@ -307,7 +322,7 @@ public static Tab2Entry[] Tab2 = new Tab2Entry[0x100];
             {
                 /// Unaligned pointer
 
-                int unalignedBytes = 4 - ((dataOffset & 3) != 0 ? 1 : 0);
+                int unalignedBytes = 4 - (dataOffset & 3);
 
                 bitsLeft = unalignedBytes * 8;
 
@@ -326,7 +341,12 @@ public static Tab2Entry[] Tab2 = new Tab2Entry[0x100];
 
             while (var_C != -1)
             {
-                if (Tab2[var_C].field_0 == (int)0x7FFFFFFF)
+                if (debug)
+                {
+                    Console.WriteLine("bitstreamPtr: 0x{0:X8}", bitstreamPtr - bitstreamStart);
+                    Console.WriteLine("Destination offset: 0x{0:X8}", (index - startOffset) / 4);
+                }
+                if (Tab2[var_C].field_0 == int.MaxValue)
                 {
                     int var_14 = (int)Tab2[var_C].field_2;
                     int var_10;
@@ -505,13 +525,12 @@ public static Tab2Entry[] Tab2 = new Tab2Entry[0x100];
                 dataOffset += tableSize;
 
                 size = (int)BitConverter.ToUInt32(srcBytes, pieceNum * 4 + 0x7c);
-                
+
                 Vlc_DecompressChunk(dataPtr,dataOffset, ref result, var_34_offset, size);
                 dataOffset += size;
 
                 pieceNum++;
             }
-
             return result;
         }
     }
