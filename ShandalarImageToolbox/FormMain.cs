@@ -31,6 +31,7 @@ namespace ShandalarImageToolbox
         public string windowTitle;
         public int selectedPaletteIndex;
         public bool useLastEmbeddedPalette;
+        public static string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads/";
         public FormMain()
         {
             
@@ -50,9 +51,8 @@ namespace ShandalarImageToolbox
             paletteComboBox.Text = paletteComboBox.SelectedItem.ToString();
             previewModeComboBox.SelectedIndex = 0;
             previewModeComboBox.Text = previewModeComboBox.SelectedItem.ToString();
-            
-
         }
+
         public void AddPalette(string name)
         {
             palettes.Add(new Color[256]);
@@ -236,7 +236,7 @@ namespace ShandalarImageToolbox
                 loadedImages.Clear();
                 for (int i = 0; i < cat.files.Count; i++)
                 {
-                    string filepath = openFileDialog.FileName;
+                    string filepath = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
                     assetsListBox.Items.Add(cat.files[i].name);
                     ShandalarAsset asset = new ShandalarAsset(filepath, cat.files[i].data, ImageType.Cat);
                     asset.childIndex = i;
@@ -380,6 +380,7 @@ namespace ShandalarImageToolbox
 
         private void AssetsListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            Console.WriteLine("New selection! " + System.DateTime.Now.ToString());
             loadedImageIndex = assetsListBox.SelectedIndex;
             if (loadedImageIndex != -1) {
                 ShandalarAsset asset = loadedImages[loadedImageIndex];
@@ -399,21 +400,19 @@ namespace ShandalarImageToolbox
         public void DecodeCatImage(ShandalarAsset asset)
         {
             byte[] uncompressedData = Vlc.VlcDecompress(asset.data);
-            File.WriteAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads/uncompressedWvl.bin", uncompressedData);
 
-
-            int width = (int)BitConverter.ToUInt32(uncompressedData, 0x1c);
-            int height = (int)BitConverter.ToUInt32(uncompressedData, 0x20);
-            int smallTableSize = (int)BitConverter.ToUInt32(uncompressedData, 0x24);
+            int width = (int)BitConverter.ToUInt32(asset.data, 0x1c);
+            int height = (int)BitConverter.ToUInt32(asset.data, 0x20);
+            int smallTableSize = (int)BitConverter.ToUInt32(asset.data, 0x24);
 
             int var_14;
             int var_24;
 
-            if ((int)BitConverter.ToUInt32(uncompressedData, 0) != 0)
+            if ((int)BitConverter.ToUInt32(asset.data, 0) != 0)
             {
                 /// var_14
                 int eax = width;
-                int ecx = (int)BitConverter.ToUInt32(uncompressedData, 0x28) - 1;
+                int ecx = (int)BitConverter.ToUInt32(asset.data, 0x28) - 1;
                 if (ecx == 0)
                     var_14 = eax / 2;
                 else
@@ -421,7 +420,7 @@ namespace ShandalarImageToolbox
 
                 /// var_24
                 eax = height;
-                ecx = (int)BitConverter.ToUInt32(uncompressedData, 0x28) - 1;
+                ecx = (int)BitConverter.ToUInt32(asset.data, 0x28) - 1;
                 if (ecx == 0)
                     var_24 = eax / 2;
                 else
@@ -437,23 +436,26 @@ namespace ShandalarImageToolbox
             int ptr2 = ptr1 + width * width * 4 + 0x80;
             int ptr3 = ptr2 + var_14 * var_14 * 4 + 0x80;
 
-            Wavelet.WaveletDecode(ref uncompressedData, ptr1, width, smallTableSize);
-            Wavelet.WaveletDecode(ref uncompressedData, ptr2, var_14, smallTableSize);
-            Wavelet.WaveletDecode(ref uncompressedData, ptr3, var_14, smallTableSize);
-            File.WriteAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads/wvlDecodedCardImageData.bin", uncompressedData);
-            /// YCbCr -> RGB
-            /*
-byte[] rgbBuf = Wavelet.Decode_YCbCrToRGB(uncompressedData,
-ptr1,
-width,
-height,
-ptr2,
-ptr3,
-var_14,
-var_24);
+            int[] tempArray = GeneralUtilityFunctions.ByteArrayToIntArray(uncompressedData, 0);
 
-/// Save image
-          */
+            Wavelet.WaveletDecode(ref tempArray, ptr1, width, smallTableSize);
+            Wavelet.WaveletDecode(ref tempArray, ptr2/4, var_14, smallTableSize);
+            Wavelet.WaveletDecode(ref tempArray, ptr3/4, var_14, smallTableSize);
+
+            /// YCbCr -> RGB
+            Bitmap outputImage = Wavelet.Decode_YCbCrToRGB(tempArray,
+            ptr1,
+            width,
+            height,
+            ptr2/4,
+            ptr3/4,
+            var_14,
+            var_24);
+
+            // Save image
+            //outputImage.Save(downloadsPath + "wvlDecodedCardImage.png");
+            asset.image = outputImage;
+            ShowImage(outputImage);
         }
 
         private void CATFileToolStripMenuItem_Click(object sender, EventArgs e)

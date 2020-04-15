@@ -456,7 +456,7 @@ public static Tab2Entry[] Tab2 = new Tab2Entry[0x100];
             int bigIndexCount = (int)BitConverter.ToUInt32(dataPtr, dataOffset);
             dataOffset += 4;
 
-            int[] bigIndexTabPtr = ByteArrayToIntArray(dataPtr, dataOffset);
+            int[] bigIndexTabPtr = GeneralUtilityFunctions.ByteArrayToIntArray(dataPtr, dataOffset);
             bigIndexTabPtr[0] = int.MinValue;
 
             dataOffset += bigIndexCount * 4;        // Skip large index table
@@ -513,18 +513,6 @@ public static Tab2Entry[] Tab2 = new Tab2Entry[0x100];
             }
 
             return result;
-        }
-        public static int[] ByteArrayToIntArray(byte[] bytes, int startOffset)
-        {
-            List<int> tempList = new List<int>();
-            int index = 0;
-            while (index + startOffset + 4 < bytes.Length)
-            {
-                tempList.Add(BitConverter.ToInt32(bytes.Skip(index + startOffset).Take(4).ToArray(), 0));
-
-                index+=4;
-            }
-            return tempList.ToArray();
         }
     }
 }
