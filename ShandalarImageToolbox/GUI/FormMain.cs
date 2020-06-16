@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace ShandalarImageToolbox
+namespace ShandalarImageToolbox.GUI
 {
  
     public partial class FormMain : Form
@@ -22,30 +22,22 @@ namespace ShandalarImageToolbox
         static extern bool AllocConsole();
 
         private List<Color[]> palettes = new List<Color[]>();
-        public Color[] lastEmbeddedPalette;
- 
-
-       
+        public Color[] lastEmbeddedPalette;   
         public List<ShandalarAsset> loadedImages = new List<ShandalarAsset>();
         public int loadedImageIndex;
         public string windowTitle;
         public int selectedPaletteIndex;
         public bool useLastEmbeddedPalette;
         public static string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Downloads/";
+
         public FormMain()
         {
-            
-
             InitializeComponent();
-
             windowTitle = Text;
-
-
 #if DEBUG
             AllocConsole();
 #endif
             SetupGrayPalette();
-
             paletteComboBox.Enabled = true;
             paletteComboBox.SelectedIndex = 0;
             paletteComboBox.Text = paletteComboBox.SelectedItem.ToString();
@@ -66,13 +58,12 @@ namespace ShandalarImageToolbox
         {
             palettes.Add(new Color[256]);
             paletteComboBox.Items.Add(name);
-
         }
+
         public void AddPalette(Color[] palette, string name)
         {
             palettes.Add(palette);
             paletteComboBox.Items.Add(name);
-
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -114,6 +105,18 @@ namespace ShandalarImageToolbox
         }
 
 
+        public static string[] duelTransparentPicFiles =
+        {
+            "Dying.pic",
+            "Poison.pic",
+            "Manastripes.pic",
+            "Summon.pic",
+            "Target.pic",
+            "Willuntap.pic",
+            "Canttarget.pic"
+
+        };
+
         /// <summary>
         /// Load and decode .PIC image
         /// </summary>
@@ -149,28 +152,25 @@ namespace ShandalarImageToolbox
             }
         }
 
-        public ShandalarAsset GetPic ( byte [] data, string name)
+        public ShandalarAsset GetPic(byte [] data, string name)
         {
             Color[] originalPalette = palettes[selectedPaletteIndex];
-
-            
-
             PicDecoder decoder = new PicDecoder(data);
 
            if(decoder.hasPalette) palettes[selectedPaletteIndex] = decoder.embeddedPalette;
 
             /// Output image as picture box
-            
-
             Bitmap bitmap = new Bitmap(decoder.width, decoder.height);
+            byte[,] imageData = new byte[decoder.width,decoder.height];
 
-           byte[,] imageData = new byte[decoder.width,decoder.height];
             decoder.DecodeImage(imageData);
+
             if (decoder.hasPalette)
             {
                 useLastEmbeddedPaletteCheckbox.Enabled = true;
                 lastEmbeddedPalette = decoder.embeddedPalette;
             }
+
             for (int y = 0; y < decoder.height; y++)
             {
                 for (int x = 0; x < decoder.width; x++)
@@ -189,7 +189,9 @@ namespace ShandalarImageToolbox
             }
             ShandalarAsset asset = new ShandalarAsset(name, data, ImageType.Pic);
             asset.image = bitmap;
-            if (asset.filePath.Contains("Rogue") || asset.filePath.Contains("Faces") || asset.filePath.Contains("Playface")) //Combine the embedded alpha channel with the main image for the face sprites
+            asset.filename = Path.GetFileNameWithoutExtension(asset.filePath);
+            Console.WriteLine(asset.filename);
+            if (asset.filePath.Contains("Rogue") || asset.filePath.Contains("Faces") || duelTransparentPicFiles.Contains(asset.filename + ".pic")) //Combine the embedded alpha channel with the main image for the face sprites
             {
                 Bitmap transparentSprite = new Bitmap(asset.image.Width / 2, asset.image.Height);
                 for(int x = 0; x < asset.image.Width/2; x++)
@@ -207,7 +209,6 @@ namespace ShandalarImageToolbox
             }
             palettes[selectedPaletteIndex] = originalPalette;
             asset.hasEmbeddedPalette = decoder.hasPalette;
-            asset.filename = Path.GetFileNameWithoutExtension(asset.filePath);
             ClearImagePanel();
             return asset;
 
@@ -250,11 +251,7 @@ namespace ShandalarImageToolbox
                 UpdateStatusBarText("Finished loading images from spr file.");
                 exportToolStripMenuItem.Enabled = true;
                 exportAllToolStripMenuItem.Enabled = true;
-                
-
-
             }
-
         }
 
         private void LoadCATFileToolStripMenuItem_Click(object sender, EventArgs e)
@@ -286,6 +283,7 @@ namespace ShandalarImageToolbox
             exportToolStripMenuItem.Enabled = true;
             exportAllToolStripMenuItem.Enabled = true;
         }
+
         public void ShowImage(Bitmap imageTexture)
         {
             ShandalarAsset image = loadedImages[loadedImageIndex];
@@ -306,6 +304,7 @@ namespace ShandalarImageToolbox
             else
                 imagePanel.BackgroundImageLayout = ImageLayout.Center;
         }
+
         public void ClearImagePanel()
         {
             imagePanel.BackgroundImage = null;
@@ -516,6 +515,12 @@ namespace ShandalarImageToolbox
 
             }
 
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AboutForm about = new AboutForm();
+            about.ShowDialog();
         }
     }
 

@@ -1,4 +1,4 @@
-﻿namespace ShandalarImageToolbox
+﻿namespace ShandalarImageToolbox.GUI
 {
     partial class FormMain
     {
@@ -59,9 +59,9 @@
             this.previewPanel = new System.Windows.Forms.Panel();
             this.imagePanel = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.hexEditor1 = new ShandalarImageToolbox.HexEditor();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -206,6 +206,7 @@
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // saveFileDialog1
             // 
@@ -293,7 +294,7 @@
             this.topPreviewUiPanel.Location = new System.Drawing.Point(0, 0);
             this.topPreviewUiPanel.Margin = new System.Windows.Forms.Padding(0);
             this.topPreviewUiPanel.Name = "topPreviewUiPanel";
-            this.topPreviewUiPanel.Size = new System.Drawing.Size(1180, 29);
+            this.topPreviewUiPanel.Size = new System.Drawing.Size(1184, 29);
             this.topPreviewUiPanel.TabIndex = 3;
             // 
             // useLastEmbeddedPaletteCheckbox
@@ -355,7 +356,7 @@
             this.previewPanel.Location = new System.Drawing.Point(0, 28);
             this.previewPanel.Margin = new System.Windows.Forms.Padding(2);
             this.previewPanel.Name = "previewPanel";
-            this.previewPanel.Size = new System.Drawing.Size(754, 588);
+            this.previewPanel.Size = new System.Drawing.Size(758, 588);
             this.previewPanel.TabIndex = 5;
             // 
             // imagePanel
@@ -368,7 +369,7 @@
             this.imagePanel.Location = new System.Drawing.Point(0, 0);
             this.imagePanel.Margin = new System.Windows.Forms.Padding(0);
             this.imagePanel.Name = "imagePanel";
-            this.imagePanel.Size = new System.Drawing.Size(754, 566);
+            this.imagePanel.Size = new System.Drawing.Size(758, 566);
             this.imagePanel.TabIndex = 4;
             // 
             // label2
@@ -382,25 +383,13 @@
             this.label2.Size = new System.Drawing.Size(0, 13);
             this.label2.TabIndex = 5;
             // 
-            // textBox1
-            // 
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Location = new System.Drawing.Point(0, 0);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(754, 588);
-            this.textBox1.TabIndex = 6;
-            this.textBox1.Visible = false;
-            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 566);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(754, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(758, 22);
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -409,12 +398,24 @@
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
             // 
+            // textBox1
+            // 
+            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox1.Location = new System.Drawing.Point(0, 0);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBox1.Size = new System.Drawing.Size(758, 588);
+            this.textBox1.TabIndex = 6;
+            this.textBox1.Visible = false;
+            // 
             // hexEditor1
             // 
             this.hexEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.hexEditor1.Location = new System.Drawing.Point(0, 0);
             this.hexEditor1.Name = "hexEditor1";
-            this.hexEditor1.Size = new System.Drawing.Size(754, 588);
+            this.hexEditor1.Size = new System.Drawing.Size(758, 588);
             this.hexEditor1.TabIndex = 0;
             // 
             // FormMain

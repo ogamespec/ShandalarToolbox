@@ -91,7 +91,7 @@ namespace ShandalarImageToolbox
         private int onesCounter;        /// Significant bit count
         private UInt32 bitMask;
         private byte[] LUT;
-        private int dword_5360E4;       /// 0x100
+        private int DecodeTableIndex;       /// 0x100
         private int savedIndex = 0;
         private byte savedByte = 0;
 
@@ -128,7 +128,7 @@ namespace ShandalarImageToolbox
             onesCounter = 9;
             bitMask = 0x1FF;
 
-            dword_5360E4 = 0x100;
+            DecodeTableIndex = 0x100;
 
             /// Fill FF FF 00 pattern
 
@@ -273,9 +273,9 @@ namespace ShandalarImageToolbox
                 int oldIndex = (int)(b & bitMask);
                 int newIndex = oldIndex;
 
-                if (oldIndex >= dword_5360E4)
+                if (oldIndex >= DecodeTableIndex)
                 {
-                    newIndex = dword_5360E4;
+                    newIndex = DecodeTableIndex;
                     oldIndex = savedIndex;
                     PushValue(savedByte);
                 }
@@ -298,11 +298,11 @@ namespace ShandalarImageToolbox
 
                 savedByte = GetLutValue(oldIndex);
                 PushValue(savedByte);
-                SetLutValue(dword_5360E4, savedByte);
-                SetLutIndex(dword_5360E4, savedIndex);
+                SetLutValue(DecodeTableIndex, savedByte);
+                SetLutIndex(DecodeTableIndex, savedIndex);
 
-                dword_5360E4++;
-                if (dword_5360E4 > bitMask)
+                DecodeTableIndex++;
+                if (DecodeTableIndex > bitMask)
                 {
                     onesCounter++;
                     bitMask = (bitMask << 1) | 1;

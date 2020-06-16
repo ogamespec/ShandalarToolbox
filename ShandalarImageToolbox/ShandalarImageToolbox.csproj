@@ -48,7 +48,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>newicon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -83,21 +83,27 @@
     </Compile>
     <Compile Include="File Format Helpers\CatFile.cs" />
     <Compile Include="File Format Helpers\CATImageDecoder.cs" />
-    <Compile Include="GeneralUtilityFunctions.cs" />
+    <Compile Include="Utility\GeneralUtilityFunctions.cs" />
     <Compile Include="File Format Helpers\Wavelet.cs" />
     <Compile Include="File Format Helpers\Vlc.cs" />
+    <Compile Include="GUI\AboutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\AboutForm.Designer.cs">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ImageAsset.cs" />
     <Compile Include="ShandalarAsset.cs" />
-    <Compile Include="FormMain.cs">
+    <Compile Include="GUI\FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormMain.Designer.cs">
+    <Compile Include="GUI\FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormPalette.cs">
+    <Compile Include="GUI\FormPalette.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormPalette.Designer.cs">
+    <Compile Include="GUI\FormPalette.Designer.cs">
       <DependentUpon>FormPalette.cs</DependentUpon>
     </Compile>
     <Compile Include="Custom Forms\OpenFolderDialog.cs" />
@@ -109,10 +115,13 @@
     <EmbeddedResource Include="Custom Forms\HexEditor\HexEditorNew.resx">
       <DependentUpon>HexEditorNew.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FormMain.resx">
+    <EmbeddedResource Include="GUI\AboutForm.resx">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FormPalette.resx">
+    <EmbeddedResource Include="GUI\FormPalette.resx">
       <DependentUpon>FormPalette.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -140,6 +149,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <Content Include="newicon.ico" />
+    <Content Include="Resources\logo.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
@@ -147,6 +158,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Classes\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
