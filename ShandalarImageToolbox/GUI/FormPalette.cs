@@ -8,20 +8,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace PicDecode
+namespace ShandalarImageToolbox.GUI
 {
     public partial class FormPalette : Form
     {
         private const int cellSize = 16;
 
-        public FormPalette(Color [] palette)
+        public FormPalette(Color[] palette)
         {
             InitializeComponent();
 
             pictureBox1.Image = BuildPaletteImage(palette);
         }
 
-        private Image BuildPaletteImage (Color [] palette)
+        private Image BuildPaletteImage (Color[] palette)
         {
             Bitmap bitmap = new Bitmap(16 * cellSize, 16 * cellSize);
 

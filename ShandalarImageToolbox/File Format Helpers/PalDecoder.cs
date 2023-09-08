@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Text.RegularExpressions;
 
-namespace PicDecode
+namespace ShandalarImageToolbox
 {
+
+ 
     class PalDecoder
     {
         public Color[] Palette = new Color[256];
@@ -19,7 +21,7 @@ namespace PicDecode
         {
             for(int i=0; i<256; i++)
             {
-                Palette[i] = Color.Black;
+                Palette[i] = Color.Transparent;
             }
         }
 
@@ -82,14 +84,16 @@ namespace PicDecode
                     rValue = Convert.ToByte(rStr);
                     gValue = Convert.ToByte(gStr);
                     bValue = Convert.ToByte(bStr);
-
                     Palette[index] = Color.FromArgb(rValue, gValue, bValue);
+                    if (Palette[index] == Color.FromArgb(255, 0, 255)) Palette[index] = Color.FromArgb(index, index, index);
                 }
                 else
                 {
                     throw new Exception("Invalid palette entry!");
                 }
             }
+
+            Palette[255] = Color.White; //workaround for images including an alpha channel not showing the alpha channel correctly
 
         }
 

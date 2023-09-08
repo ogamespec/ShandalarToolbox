@@ -1,15 +1,4 @@
-# PicDecoder
+# ShandalarImageToolbox
+This fork adds the ability to export to .png, and open .pic files with embedded palette data, .spr files, and the .wvl card art images inside of the .cat archive files.
 
-Microprose classic games .PIC file format decoder (particulary from Magic: The Gathering 1997).
-
-I spend several hours figuring out how this crazy decoding work :p  (PicReveresing.c)
-
-First, load appropriate .TR palette:
-
-![Palette View](/images/palview.jpg)
-
-And now you can load .PIC images:
-
-![PIC View](/images/picview.jpg)
-
-Enjoy!
+Original version, and code for wvl and cat file parsing was made by https://github.com/ogamespec
